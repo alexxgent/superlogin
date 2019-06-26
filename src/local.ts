@@ -5,9 +5,6 @@ import LocalStrategy from 'passport-local'
 import { Superlogin } from './types'
 import util from './util'
 
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
 const BearerStrategy = Bearer.Strategy
 
 type IDoneFunc = (
@@ -114,5 +111,5 @@ const local = (config: IConfigure, passport: PassportStatic, user: User) => {
 export default local
 
 declare global {
-  type Local = typeof local
+  export type Local = typeof local
 }

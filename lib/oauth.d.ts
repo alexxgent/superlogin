@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import { Router } from 'express';
 import { Passport, Strategy as StrategyType } from 'passport';
 declare const oauth: (router: Router, passport: Passport, user: any, config: IConfigure) => {
@@ -7,6 +6,6 @@ declare const oauth: (router: Router, passport: Passport, user: any, config: ICo
     registerTokenProvider: (providerName: string, Strategy: StrategyType) => void;
 };
 export default oauth;
-declare global  {
+declare global {
     type Oauth = typeof oauth;
 }

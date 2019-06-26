@@ -2,8 +2,6 @@ import { Router } from 'express'
 import { Passport } from 'passport'
 import { Superlogin } from './types'
 import util from './util'
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
 
 const routes = (config: IConfigure, router: Router, passport: Passport, user: User) => {
   router.post(
@@ -18,10 +16,8 @@ const routes = (config: IConfigure, router: Router, passport: Passport, user: Us
           return res.status(401).json(info)
         }
         // Success
-        req.logIn(
-          passportUser,
-          { session: false },
-          loginErr => (loginErr ? next(loginErr) : undefined)
+        req.logIn(passportUser, { session: false }, loginErr =>
+          loginErr ? next(loginErr) : undefined
         )
         return next()
       })(req, res, next)
@@ -227,5 +223,5 @@ const routes = (config: IConfigure, router: Router, passport: Passport, user: Us
 export default routes
 
 declare global {
-  type Routes = typeof routes
+  export type Routes = typeof routes
 }

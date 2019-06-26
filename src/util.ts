@@ -3,11 +3,9 @@ import crypto from 'crypto'
 import { Request } from 'express'
 import merge from 'lodash.merge'
 import URLSafeBase64 from 'urlsafe-base64'
+import { promisify } from 'util'
 import uuid from 'uuid'
 import { Superlogin } from './types'
-
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
 
 const URLSafeUUID = () => URLSafeBase64.encode(uuid.v4(null, new Buffer(16)))
 
@@ -35,7 +33,7 @@ const verifyPassword = async (
   password: string
 ) => {
   // tslint:disable-next-line:no-any
-  const getHash: any = Promise.promisify(pwd.hash, { context: pwd })
+  const getHash: any = promisify(pwd.hash)
   const { iterations, salt, derived_key } = hashObj
   if (iterations) {
     pwd.iterations(iterations)
@@ -51,7 +49,7 @@ const verifyPassword = async (
   ) {
     return Promise.reject(false)
   }
-  return Promise.resolve(true)
+  return true
 }
 
 const getDBURL = ({ user, protocol, host, password }: Superlogin.IConfiguration['dbServer']) =>

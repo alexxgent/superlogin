@@ -1,14 +1,12 @@
 import d from 'debug'
 import fsBase from 'fs-extra'
 import path from 'path'
+import promisifyAll from 'util-promisifyall'
 import { Superlogin } from '../types'
 
 const debug = d('superlogin')
 
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
-const fs = Promise.promisifyAll(fsBase)
+const fs = promisifyAll(fsBase)
 
 const FileAdapter = (config: IConfigure): Superlogin.IAdapter => {
   const fileConfig = config.get().session.file

@@ -18,9 +18,6 @@ import User from './user'
 import util from './util'
 
 // tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
-// tslint:disable-next-line:no-var-requires
 const userDesign = require('../designDocs/user-design')
 
 export type DBType = Superlogin.DBType
@@ -42,7 +39,7 @@ PouchDB.plugin(PouchSecurity).plugin(PouchUpsert)
 const init = async (
   configData: Superlogin.IUserConfig,
   passport?: PassportStatic,
-  userDB?: PouchDB.Database,
+  userDB?: PouchDB.Database<IUserDoc>,
   couchAuthDB?: PouchDB.Database
 ) => {
   const config = Configure(configData, defaultConfig)

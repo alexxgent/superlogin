@@ -3,9 +3,6 @@ import { Superlogin } from '../types'
 
 const debug = d('superlogin')
 
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
 const MemoryAdapter = (): Superlogin.IAdapter => {
   const _keys = {}
   const _expires = {}
@@ -34,7 +31,7 @@ const MemoryAdapter = (): Superlogin.IAdapter => {
     if (_keys[key] && _expires[key] > now) {
       return Promise.resolve(_keys[key])
     }
-    return Promise.resolve(false)
+    return false
   }
 
   const deleteKeys = async (keys: string[]) => {

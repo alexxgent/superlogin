@@ -1,6 +1,6 @@
 // 'use strict'
 // var PouchDB = require('pouchdb-node')
-// var Promise = require('bluebird')
+//
 // var expect = require('chai').expect
 // var cloudant = require('../lib/dbAuth/cloudant').default
 

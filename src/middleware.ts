@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express'
 import { PassportStatic } from 'passport'
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
+
 // Contains middleware useful for securing your routes
 const middleware = (passport: PassportStatic) => {
   const forbiddenError = {
@@ -76,5 +75,5 @@ const middleware = (passport: PassportStatic) => {
 export default middleware
 
 declare global {
-  type Middleware = typeof middleware
+  export type Middleware = typeof middleware
 }

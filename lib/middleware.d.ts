@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import { RequestHandler } from 'express';
 import { PassportStatic } from 'passport';
 declare const middleware: (passport: PassportStatic) => {
@@ -8,6 +7,6 @@ declare const middleware: (passport: PassportStatic) => {
     requireAllRoles: (requiredRoles: string[]) => RequestHandler;
 };
 export default middleware;
-declare global  {
+declare global {
     type Middleware = typeof middleware;
 }

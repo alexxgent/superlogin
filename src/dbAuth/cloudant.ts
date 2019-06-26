@@ -2,8 +2,6 @@ import request from 'superagent'
 import url from 'url'
 import { Superlogin } from '../types'
 import util from './../util'
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
 
 const getSecurityUrl = (db: PouchDB.Database) =>
   url.format(`${url.parse(db.name).pathname}/_security`)
@@ -21,7 +19,7 @@ const getAPIKey = async (db: PouchDB.Database) => {
     }
   } catch (error) {
     console.error('error getting api key!', error)
-    return Promise.reject(error)
+    throw error
   }
 }
 
@@ -40,7 +38,7 @@ const putSecurityCloudant = async (db: PouchDB.Database, doc: {}) => {
       .send(doc)
     return JSON.parse(res.text)
   } catch (error) {
-    return Promise.reject(error)
+    throw error
   }
 }
 
@@ -48,7 +46,7 @@ const putSecurityCloudant = async (db: PouchDB.Database, doc: {}) => {
 const storeKey = async () => Promise.resolve()
 
 // This is not needed with Cloudant
-const removeKeys = async () => Promise.resolve()
+const removeKeys = async () => Promise.resolve(false)
 
 const initSecurity = async (db: PouchDB.Database, adminRoles: string[], memberRoles: string[]) => {
   let changes = false
@@ -126,7 +124,7 @@ const deauthorizeKeys = async (db: PouchDB.Database, keys: string[]) => {
 
   let changes = false
   if (!secDoc.cloudant) {
-    return Promise.resolve(false)
+    return false
   }
   keys.forEach(key => {
     if (secDoc.cloudant[key]) {
@@ -152,7 +150,7 @@ export default {
 }
 
 declare global {
-  interface IDBAdapter {
+  export interface IDBAdapter {
     getAPIKey?(
       db: PouchDB.Database
     ): Promise<

@@ -1,10 +1,9 @@
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
 import d from 'debug'
 import ejs, { Data } from 'ejs'
 import fs from 'fs'
 import nodemailer from 'nodemailer'
 import stubTransport from 'nodemailer-stub-transport'
+import { promisify } from 'util'
 
 const debug = d('superlogin')
 
@@ -18,10 +17,11 @@ const mailer = (config: IConfigure): IMailer => {
 
   // Initialize the transport mechanism with nodermailer
   const transporter = nodemailer.createTransport(transport)
-  const sendEmail = Promise.promisify(transporter.sendMail, { context: transporter })
+  transporter.sendMail = transporter.sendMail.bind(transporter)
+  const sendEmail = promisify(transporter.sendMail)
 
   return {
-    sendEmail: (templateName: string, email: string, locals: Data) => {
+    sendEmail: async (templateName: string, email: string, locals: Data) => {
       // load the template and parse it
       const template = config.get().emails[templateName]
       if (!template) {

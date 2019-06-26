@@ -17,13 +17,13 @@ declare const user: (config: IConfigure, userDB: PouchDB.Database<Superlogin.IUs
             memberRoles: string[];
         };
         getDesignDoc: (docName: string) => any;
-        removeExpiredKeys: () => Promise<any[] | undefined>;
+        removeExpiredKeys: () => Promise<string[] | undefined>;
         addUserDB: (userDoc: Superlogin.IUserDoc, dbName: string, designDocs?: string[] | undefined, type?: string | undefined, permissions?: string[] | undefined, aRoles?: string[] | undefined, mRoles?: string[] | undefined) => Promise<string>;
         authorizeUserSessions: (user_id: string, personalDBs: {}, keys: string | string[], roles: string[]) => Promise<(boolean | void)[] | undefined>;
         authorizeKeys: (user_id: string, db: PouchDB.Database<{}>, keys: string[], permissions?: string[] | undefined, roles?: string[] | undefined) => Promise<boolean | void>;
         deauthorizeKeys: (db: PouchDB.Database<{}>, keys: string | string[]) => Promise<boolean | void>;
-        deauthorizeUser: (userDoc: Superlogin.IUserDoc, keys: string | string[]) => Promise<boolean | (boolean | void)[]>;
-        removeKeys: (keys: string | string[]) => Promise<boolean | void | PouchDB.Core.Response[]>;
+        deauthorizeUser: (userDoc: Superlogin.IUserDoc, keys: string | string[]) => Promise<false | (boolean | void)[]>;
+        removeKeys: (keys: string | string[]) => Promise<boolean | PouchDB.Core.Response[] | PouchDB.Core.Error[]>;
         storeKey: (username: string, key: string, password: string, expires?: number | undefined, roles?: string[] | undefined) => Promise<void | {
             _id: string;
             type: string;
@@ -151,7 +151,7 @@ declare const user: (config: IConfigure, userDB: PouchDB.Database<Superlogin.IUs
     linkSocial: (user_id: string, provider: string, auth: string, profile: Superlogin.IProfile, req: {
         ip: string;
     }) => Promise<Superlogin.IUserDoc>;
-    unlink: (user_id: string, provider: string) => Promise<(Superlogin.IUserDoc & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta) | undefined>;
+    unlink: (user_id: string, provider: "local" | "google") => Promise<(Superlogin.IUserDoc & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta) | undefined>;
     createSession: (user_id: string, provider: string, req: {
         ip: string;
     }) => Promise<Partial<Superlogin.IUserDoc> | undefined>;
@@ -196,11 +196,11 @@ declare const user: (config: IConfigure, userDB: PouchDB.Database<Superlogin.IUs
     addUserDB: (user_id: string, dbName: string, type: string, designDocs: string[], permissions: string[]) => Promise<(Superlogin.IUserDoc & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta) | undefined>;
     removeUserDB: (user_id: string, dbName: string, deletePrivate: boolean, deleteShared: boolean) => Promise<void | PouchDB.UpsertResponse>;
     logoutUser: (user_id: string, session_id: string) => Promise<PouchDB.UpsertResponse>;
-    logoutSession: (session_id: string) => Promise<boolean | PouchDB.UpsertResponse>;
-    logoutOthers: (session_id: string) => Promise<boolean | PouchDB.UpsertResponse>;
+    logoutSession: (session_id: string) => Promise<false | PouchDB.UpsertResponse>;
+    logoutOthers: (session_id: string) => Promise<false | PouchDB.UpsertResponse>;
     logoutUserSessions: (userDoc: Superlogin.IUserDoc, op: string, currentSession?: string | undefined) => Promise<Superlogin.IUserDoc>;
     remove: (user_id: string, destroyDBs: boolean) => Promise<void | PouchDB.Core.Response>;
-    removeExpiredKeys: () => Promise<any[] | undefined>;
+    removeExpiredKeys: () => Promise<string[] | undefined>;
     confirmSession: (key: string, password: string) => Promise<{
         _id: string;
         expires: number;
@@ -218,7 +218,7 @@ declare const user: (config: IConfigure, userDB: PouchDB.Database<Superlogin.IUs
     }>;
     quitRedis: () => Promise<void>;
 };
-declare global  {
+declare global {
     type User = any;
 }
 export default user;

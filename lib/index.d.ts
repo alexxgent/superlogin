@@ -14,5 +14,5 @@ export declare type ISession = Superlogin.ISession;
 export declare type IUserConfig = Superlogin.IUserConfig;
 export declare type IUserDoc = Superlogin.IUserDoc;
 export declare type Strategy = Strategy;
-declare const init: (configData: Superlogin.IUserConfig, passport?: PassportStatic | undefined, userDB?: PouchDB.Database<{}> | undefined, couchAuthDB?: PouchDB.Database<{}> | undefined) => Promise<Superlogin.ISLInstance>;
+declare const init: (configData: Superlogin.IUserConfig, passport?: PassportStatic | undefined, userDB?: PouchDB.Database<Superlogin.IUserDoc> | undefined, couchAuthDB?: PouchDB.Database<{}> | undefined) => Promise<Superlogin.ISLInstance>;
 export default init;

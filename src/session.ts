@@ -3,8 +3,6 @@ import MemoryAdapter from './sessionAdapters/MemoryAdapter'
 import RedisAdapter from './sessionAdapters/RedisAdapter'
 import { Superlogin } from './types'
 import util from './util'
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
 
 const tokenPrefix = 'token'
 
@@ -18,7 +16,9 @@ const Session = (config: IConfigure) => {
   const adapter =
     sessionAdapter === 'redis'
       ? RedisAdapter(config)
-      : sessionAdapter === 'file' ? FileAdapter(config) : MemoryAdapter()
+      : sessionAdapter === 'file'
+      ? FileAdapter(config)
+      : MemoryAdapter()
 
   return {
     confirmToken: async (key: string, password: string) => {

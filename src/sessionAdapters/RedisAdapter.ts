@@ -1,13 +1,9 @@
 import d from 'debug'
-import redisBase, { RedisClient } from 'redis'
+import redis, { RedisClient } from 'redis'
+import promisifyAll from 'util-promisifyall'
 import { Superlogin } from '../types'
 
 const debug = d('superlogin')
-
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
-const redis = Promise.promisifyAll(redisBase)
 
 interface IPromRedis extends RedisClient {
   authAsync(pwd: string): Promise<void>
@@ -24,11 +20,13 @@ const RedisAdapter = (config: IConfigure): Superlogin.IAdapter => {
 
   const { unix_socket, url, port, host, options, password } = finalRedisConfig
 
-  const redisClient = unix_socket
-    ? (redis.createClient(unix_socket, options) as IPromRedis)
-    : url
+  const redisClient = promisifyAll(
+    unix_socket
+      ? (redis.createClient(unix_socket, options) as IPromRedis)
+      : url
       ? (redis.createClient(url, options) as IPromRedis)
       : (redis.createClient(port || 6379, host || '127.0.0.1', options) as IPromRedis)
+  )
 
   // Authenticate with Redis if necessary
   if (password) {

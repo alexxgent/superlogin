@@ -4,7 +4,7 @@ import { Transport, TransportOptions } from 'nodemailer'
 import { PassportStatic, Strategy } from 'passport'
 
 export declare namespace Superlogin {
-  interface IAdapter {
+  export interface IAdapter {
     _getFilepath?(path: string): string
     _removeExpired?(path: string): void
     deleteKeys(keys: string[]): Promise<number>
@@ -13,11 +13,11 @@ export declare namespace Superlogin {
     storeKey(key: string, life: number, data: {}): Promise<void>
   }
 
-  interface ISecurityDoc {
+  export interface ISecurityDoc {
     admins: { roles: string[]; names: string[]; members?: string[] }
     members: { roles: string[]; names: string[]; members?: string[] }
   }
-  type DBType = 'private' | 'shared'
+  export type DBType = 'private' | 'shared'
   interface IConfiguration {
     // Useful settings for testing and debugging your app
     testMode?: {
@@ -193,7 +193,7 @@ export declare namespace Superlogin {
     }
   }
 
-  interface IUserConfig {
+  export interface IUserConfig {
     testMode?: IConfiguration['testMode']
     security?: Partial<IConfiguration['security']>
     local?: Partial<IConfiguration['local']>
@@ -228,7 +228,7 @@ export declare namespace Superlogin {
     username: string
     id: string
     email: string
-    emails: { value: string }[]
+    emails: Array<{ value: string }>
   }
 
   interface IActivity {
@@ -422,7 +422,7 @@ export declare namespace Superlogin {
     requireAllRoles(requiredRoles: string[]): RequestHandler
   }
 
-  interface ISLInstance extends IBaseSLInstance {
+  export interface ISLInstance extends IBaseSLInstance {
     on(event: string, cb: {}): void
   }
 }

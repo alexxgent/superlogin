@@ -23,7 +23,8 @@ module.exports = {
     adapter: 'redis'
   },
   mailer: {
-    fromEmail: 'me@example.com'
+    fromEmail: 'me@example.com',
+    logger: true
   },
   userDBs: {
     designDocDir: __dirname + '/ddocs',

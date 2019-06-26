@@ -1,6 +1,6 @@
 'use strict'
 var PouchDB = require('pouchdb-node')
-var Promise = require('bluebird')
+
 var seed = require('pouchdb-seed-design')
 var request = require('superagent')
 var expect = require('chai').expect
@@ -51,7 +51,7 @@ describe('DBAuth', function() {
         expect(result).to.equal(false)
         return dbAuth.createDB(testDBName)
       })
-      .then(function() {
+      .then(function(result) {
         return checkDBExists(testDBName)
       })
       .then(function(result) {
@@ -280,14 +280,14 @@ describe('DBAuth', function() {
         expect(docs[5].members.names[0]).to.equal('goodkey2')
         // Now we'll make sure the expired keys have been deleted from the users database
         var promises = []
-        promises.push(keysDB.get('org.couchdb.user:oldkey1'))
-        promises.push(keysDB.get('org.couchdb.user:oldkey2'))
-        return Promise.settle(promises)
+        promises.push(keysDB.get('org.couchdb.user:oldkey1').catch(err => err))
+        promises.push(keysDB.get('org.couchdb.user:oldkey2').catch(err => err))
+        return Promise.all(promises)
       })
       .then(function(results) {
         /* jshint -W030 */
-        expect(results[0].isRejected()).to.be.true
-        expect(results[1].isRejected()).to.be.true
+        expect(results[0].error).to.equal('not_found')
+        expect(results[1].error).to.equal('not_found')
         /* jshint +W030 */
         // Finally clean up
         return Promise.all([db1.destroy(), db2.destroy()])
@@ -303,19 +303,18 @@ describe('DBAuth', function() {
 
 function checkDBExists(dbname) {
   var finalUrl = dbUrl + '/' + dbname
-  return Promise.fromNode(function(callback) {
-    request.get(finalUrl).end(callback)
-  }).then(
-    function(res) {
+  return request
+    .get(finalUrl)
+    .then(function(res) {
+      if (res.status === 404 || !res.text) {
+        return Promise.resolve(false)
+      }
       var result = JSON.parse(res.text)
       if (result.db_name) {
         return Promise.resolve(true)
       }
-    },
-    function(err) {
-      if (err.status === 404) {
-        return Promise.resolve(false)
-      }
-    }
-  )
+    })
+    .catch(function() {
+      return Promise.resolve(false)
+    })
 }

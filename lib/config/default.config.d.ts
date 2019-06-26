@@ -37,8 +37,11 @@ declare const defaultConfig: {
             format: string;
         };
     };
+    mailer: {
+        logger: boolean;
+    };
 };
 export default defaultConfig;
-declare global  {
+declare global {
     type IDefaultConfig = typeof defaultConfig;
 }

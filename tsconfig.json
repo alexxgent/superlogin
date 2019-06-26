@@ -1,49 +1,35 @@
 {
-	"compilerOptions": {
-		"allowJs": false,
-		"allowSyntheticDefaultImports": true,
-		"alwaysStrict": true,
-		"baseUrl": "./src/",
-		"declaration": true,
-		"emitDecoratorMetadata": false,
-		"experimentalDecorators": true,
-		"importHelpers": true,
-		"module": "esnext",
-		"moduleResolution": "node",
-		"noImplicitAny": true,
-		"noImplicitThis": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": false,
-		"outDir": "./tmp",
-		"pretty": true,
-		"removeComments": true,
-		"rootDir": "./src/",
-		"skipLibCheck": true,
-		"sourceMap": false,
-		"strict": true,
-		"strictNullChecks": true,
-		"suppressImplicitAnyIndexErrors": true,
-		"target": "esnext",
-		"watch": false,
-		"paths": {
-			"config/*": [
-				"./config/*"
-			],
-			"dbAuth/*": [
-				"./dbAuth/*"
-			],
-			"sessionAdapters/*": [
-				"./sessionAdapters/*"
-			]
-		},
-		"plugins": [
-			{
-				"name": "tslint-language-service"
-			}
-		]
-	},
-	"include": [
-		"./types/**/*.d.ts",
-		"./src/**/*.ts",
-	]
+  "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "baseUrl": "./src/",
+    "declaration": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "outDir": "./tmp",
+    "pretty": true,
+    "removeComments": true,
+    "rootDir": "./src/",
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "esnext",
+    "watch": false,
+    "paths": {
+      "config/*": ["./config/*"],
+      "dbAuth/*": ["./dbAuth/*"],
+      "sessionAdapters/*": ["./sessionAdapters/*"]
+    }
+  },
+  "include": ["types/**/*", "src/**/*"]
 }

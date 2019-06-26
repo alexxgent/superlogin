@@ -8,9 +8,6 @@ import Session from './session'
 import { Superlogin } from './types'
 import util from './util'
 
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
 // regexp from https://github.com/angular/angular.js/blob/master/src/ng/directive/inupsert.js#L4
 const EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/
 const USER_REGEXP = /^[a-z0-9_-]{3,16}$/
@@ -24,14 +21,12 @@ const user = (
 ) => {
   const dbAuth = DBAuth(config, userDB, couchAuthDB)
   const session = Session(config)
-  const onCreateActions: ((
-    userDoc: Superlogin.IUserDoc,
-    provider: string
-  ) => Promise<Superlogin.IUserDoc>)[] = []
-  const onLinkActions: ((
-    userDoc: Superlogin.IUserDoc,
-    provider: string
-  ) => Promise<Superlogin.IUserDoc>)[] = []
+  const onCreateActions: Array<
+    (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+  > = []
+  const onLinkActions: Array<
+    (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+  > = []
 
   // Token valid for 24 hours by default
   // Forget password token life
@@ -81,10 +76,9 @@ const user = (
           return merge({}, oldData, finalUser)
         })
       }
-      return Promise.resolve(finalUser)
+      return finalUser
     } catch (error) {
-      console.error('error logging activity', error)
-      return Promise.resolve(userDoc)
+      return userDoc
     }
   }
 
@@ -187,15 +181,15 @@ const user = (
       }
 
       if (finalUser) {
-        return await userDB.upsert<Superlogin.IUserDoc>(finalUser._id, rawUser => {
+        return userDB.upsert<Superlogin.IUserDoc>(finalUser._id, rawUser => {
           const { session: _, ...oldUser } = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc>
-          return merge({}, oldUser, finalUser)
+          return (finalUser ? merge({}, oldUser, finalUser) : oldUser) as Superlogin.IUserDoc
         })
       }
-      return Promise.resolve(false)
+      return false
     } catch (error) {
       console.error('error logging out others', error)
-      return Promise.resolve(false)
+      return false
     }
   }
 
@@ -276,7 +270,7 @@ const user = (
       })
     } catch (error) {
       console.error('error generating session!', error)
-      return Promise.reject(error)
+      throw error
     }
   }
 
@@ -293,11 +287,11 @@ const user = (
     })
 
     if (results.rows.length === 0) {
-      return Promise.resolve(base)
+      return base
     }
     results.rows.forEach(({ id }) => entries.push(id))
     if (entries.indexOf(base) === -1) {
-      return Promise.resolve(base)
+      return base
     }
     let num = 0
     while (!finalName) {
@@ -384,7 +378,11 @@ const user = (
     matches: 'confirmPassword'
   }
 
-  passwordConstraints = merge({}, passwordConstraints, config.get().local.passwordConstraints)
+  const defaultPConstraints = config.get().local.passwordConstraints as typeof passwordConstraints
+
+  passwordConstraints = defaultPConstraints
+    ? merge({}, passwordConstraints, defaultPConstraints)
+    : passwordConstraints
 
   const userModel = {
     async: true,
@@ -482,7 +480,9 @@ const user = (
   }
 
   const processTransformations = async (
-    fnArray: ((userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>)[],
+    fnArray: Array<
+      (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+    >,
     userDoc: Superlogin.IUserDoc,
     provider: string
   ) => {
@@ -716,7 +716,7 @@ const user = (
         status: 409
       })
     }
-    let emailConflict: { rows: { id?: string }[] }
+    let emailConflict: { rows: Array<{ id?: string }> }
     // Check email for conflict
     if (!profile.emails) {
       emailConflict = { rows: [] }
@@ -762,7 +762,7 @@ const user = (
     return finalUser
   }
 
-  const unlink = async (user_id: string, provider: string) => {
+  const unlink = async (user_id: string, provider: 'local' | 'google') => {
     // We cannot unlink local
     if (provider === 'local') {
       return Promise.reject({
@@ -802,15 +802,13 @@ const user = (
         })
       }
       await userDB.upsert<Superlogin.IUserDoc>(unLinkUser._id, oldUser => {
-        const { [provider]: deleted, ...newUser } = oldUser as PouchDB.Core.Document<
-          Superlogin.IUserDoc
-        >
+        const { [provider]: deleted, ...newUser } = oldUser
         if (newUser.providers) {
           // Remove the unlinked provider from the list of providers
           newUser.providers.splice(unLinkUser.providers.indexOf(provider), 1)
         }
-        unLinkUser = newUser
-        return newUser
+        unLinkUser = newUser as Superlogin.IUserDoc
+        return newUser as Superlogin.IUserDoc
       })
       return unLinkUser
     } catch (error) {
@@ -900,12 +898,9 @@ const user = (
         let publicURL: string
         const configPublicURL = config.get().dbServer.publicURL
         if (configPublicURL) {
-          const dbObj = url.parse(configPublicURL) as {
-            auth: string
-            format(): string
-          }
+          const dbObj = url.parse(configPublicURL)
           dbObj.auth = `${newSession.token}:${newSession.password}`
-          publicURL = dbObj.format()
+          publicURL = url.format(dbObj)
         } else {
           publicURL = `${config.get().dbServer.protocol}${newSession.token}:${
             newSession.password
@@ -1001,7 +996,7 @@ const user = (
             status: 400
           })
       )
-      .then(async (results: { rows: { doc: Superlogin.IUserDoc }[] }) => {
+      .then(async (results: { rows: Array<{ doc: Superlogin.IUserDoc }> }) => {
         if (!results.rows.length) {
           return Promise.reject({ status: 400, error: 'Invalid token' })
         }
@@ -1399,10 +1394,10 @@ const user = (
           return merge({}, oldUser, logoutUserDoc)
         })
       }
-      return Promise.resolve(false)
+      return false
     } catch (error) {
       console.error('error logging out session', error)
-      return Promise.resolve(false)
+      return false
     }
   }
 
@@ -1532,7 +1527,7 @@ const user = (
 
 declare global {
   // tslint:disable-next-line:no-any
-  type User = any
+  export type User = any
 }
 
 export default user

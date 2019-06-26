@@ -1,6 +1,3 @@
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
 import merge from 'lodash.merge'
 import util from '../util'
 
@@ -36,7 +33,7 @@ const couchdb = (couchAuthDB: PouchDB.Database): IDBAdapter => {
       const keyDocs = await couchAuthDB.allDocs({ keys: keylist })
       if (keyDocs.rows && keyDocs.rows.length > 0) {
         const toDelete = keyDocs.rows.reduce(
-          (r: {}[], row) =>
+          (r: Array<{}>, row) =>
             !row.value || row.value.deleted
               ? r
               : [
@@ -50,13 +47,13 @@ const couchdb = (couchAuthDB: PouchDB.Database): IDBAdapter => {
           []
         )
         if (toDelete.length > 0) {
-          return await couchAuthDB.bulkDocs(toDelete)
+          return couchAuthDB.bulkDocs(toDelete)
         }
       }
-      return Promise.resolve(false)
+      return false
     } catch (error) {
       console.error('error removing keys!', error)
-      return Promise.resolve(false)
+      return false
     }
   }
 
@@ -74,7 +71,7 @@ const couchdb = (couchAuthDB: PouchDB.Database): IDBAdapter => {
       return await security.save()
     } catch (error) {
       console.error('error initializing security', error)
-      return Promise.resolve(false)
+      return false
     }
   }
 
@@ -87,7 +84,7 @@ const couchdb = (couchAuthDB: PouchDB.Database): IDBAdapter => {
       return await security.save()
     } catch (error) {
       console.error('error authorizing keys', error)
-      return Promise.resolve(false)
+      return false
     }
   }
 
@@ -101,7 +98,7 @@ const couchdb = (couchAuthDB: PouchDB.Database): IDBAdapter => {
       return await security.save()
     } catch (error) {
       console.error('error deauthorizing keys!', error)
-      return Promise.resolve(false)
+      return false
     }
   }
 
@@ -125,7 +122,9 @@ declare global {
       roles?: string[]
     ): Promise<void | boolean>
     deauthorizeKeys(db: PouchDB.Database, keys: string[] | string): Promise<void | boolean>
-    removeKeys(keys: string[] | string): Promise<boolean | PouchDB.Core.Response[] | void>
+    removeKeys(
+      keys: string[] | string
+    ): Promise<boolean | PouchDB.Core.Response[] | PouchDB.Core.Error[]>
     storeKey(
       username: string,
       key: string,

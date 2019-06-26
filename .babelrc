@@ -1,27 +1,31 @@
 {
-	"presets": [
-		"@babel/typescript",
-		[
-			"@babel/env",
-			{
-				"loose": true,
-				"exclude": ["transform-regenerator"],
-				"shippedProposals": true
-			}
-		]
-	],
-	"plugins": [
-		"module:fast-async",
-		[
-			"module-resolver",
-			{
-				"root": ["./src"],
-				"alias": {
-					"config": "./config",
-					"dbAuth": "./dbAuth",
-					"sessionAdapters": "./sessionAdapters"
-				}
-			}
-		]
-	]
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "exclude": ["transform-regenerator"],
+        "loose": true,
+        "modules": "commonjs",
+        "useBuiltIns": "entry",
+        "corejs": 3
+      }
+    ],
+    "@babel/typescript"
+  ],
+  "plugins": [
+    "@babel/transform-arrow-functions",
+    "@babel/proposal-class-properties",
+    ["module:fast-async", { "useRuntimeModule": true }],
+    [
+      "module-resolver",
+      {
+        "root": ["./src"],
+        "alias": {
+          "config": "./config",
+          "dbAuth": "./dbAuth",
+          "sessionAdapters": "./sessionAdapters"
+        }
+      }
+    ]
+  ]
 }

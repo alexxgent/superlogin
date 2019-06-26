@@ -4,8 +4,6 @@ import { Superlogin } from '../types'
 import util from './../util'
 import CloudantAdapter from './cloudant'
 import CouchAdapter from './couchdb'
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
 
 // Escapes any characters that are illegal in a CouchDB database name using percent codes inside parenthesis
 // Example: 'My.name@example.com' => 'my(2e)name(40)example(2e)com'
@@ -34,10 +32,10 @@ const dbAuth = (config: IConfigure, userDB: PouchDB.Database, couchAuthDB: Pouch
     const finalUrl = `${util.getDBURL(config.get().dbServer)}/${dbName}`
     try {
       const db = new PouchDB(finalUrl)
-      return await db.info()
+      return db.info()
     } catch (error) {
       console.error('create DB error', error)
-      return Promise.reject(error)
+      throw error
     }
   }
 
@@ -80,7 +78,7 @@ const dbAuth = (config: IConfigure, userDB: PouchDB.Database, couchAuthDB: Pouch
   const deauthorizeUser = async (userDoc: Superlogin.IUserDoc, keys: string[] | string) => {
     if (!userDoc) {
       console.error('deauthorizeUser error - no userdoc specified')
-      return Promise.resolve(false)
+      return false
     }
     // If keys is not specified we will deauthorize all of the users sessions
     const finalKeys = keys ? util.toArray(keys) : util.getSessions(userDoc)
@@ -100,7 +98,7 @@ const dbAuth = (config: IConfigure, userDB: PouchDB.Database, couchAuthDB: Pouch
       )
     }
     console.error('deauthorizeUser error - user has no personalDBs')
-    return Promise.resolve(false)
+    return false
   }
 
   const authorizeUserSessions = async (
@@ -183,6 +181,7 @@ const dbAuth = (config: IConfigure, userDB: PouchDB.Database, couchAuthDB: Pouch
       }
       return finalDBName
     } catch (error) {
+      // tslint:disable-next-line:no-console
       console.error('create user db error', error)
       return finalDBName
     }
@@ -196,17 +195,18 @@ const dbAuth = (config: IConfigure, userDB: PouchDB.Database, couchAuthDB: Pouch
         include_docs: true
       })
       const { expiredKeys, userDocs, keysByUser } = results.rows.reduce(
-        (r, { value, doc }) => {
-          if (!value) {
+        (r, row) => {
+          if (!row || !row.value) {
             return r
           }
-          const { user, key } = value
+
+          const { user, key } = row.value as { user: string; key: string }
           // Append expired keys
           const newExpiredKeys = [...r.expiredKeys, key]
           const newKeysByUser = { ...r.keysByUser, [user]: key }
 
-          if (doc) {
-            const { session, ...userDoc } = doc
+          if (row.doc) {
+            const { session, ...userDoc } = row.doc
             const { [key]: deleted, ...finalSession } = session
             const newUserDocs = { ...r.userDocs, [user]: { ...userDoc, session: finalSession } }
             return { expiredKeys: newExpiredKeys, userDocs: newUserDocs, keysByUser: newKeysByUser }
@@ -223,6 +223,7 @@ const dbAuth = (config: IConfigure, userDB: PouchDB.Database, couchAuthDB: Pouch
       await userDB.bulkDocs(Object.values(userDocs))
       return expiredKeys
     } catch (error) {
+      // tslint:disable-next-line:no-console
       console.error('error expiring keys', error)
       return undefined
     }
@@ -280,10 +281,9 @@ const dbAuth = (config: IConfigure, userDB: PouchDB.Database, couchAuthDB: Pouch
       const db = new PouchDB(`${util.getDBURL(config.get().dbServer)}/${dbName}`, {
         skip_setup: true
       })
-      return await db.destroy()
+      return db.destroy()
     } catch (error) {
-      console.error('remove db failed!', dbName, error)
-      return Promise.reject(error)
+      throw error
     }
   }
 

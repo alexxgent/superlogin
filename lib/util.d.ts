@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import { Request } from 'express';
 import { Superlogin } from './types';
 declare const _default: {

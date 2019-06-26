@@ -41,11 +41,14 @@ const defaultConfig = {
       template: join(__dirname, '../../templates/email/forgot-password.ejs'),
       format: 'text'
     }
+  },
+  mailer: {
+    logger: true
   }
 }
 
 export default defaultConfig
 
 declare global {
-  type IDefaultConfig = typeof defaultConfig
+  export type IDefaultConfig = typeof defaultConfig
 }

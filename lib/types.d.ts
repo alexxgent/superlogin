@@ -1,4 +1,3 @@
-/// <reference types="express" />
 /// <reference types="pouchdb-core" />
 /// <reference types="pouchdb-upsert" />
 import { Data } from 'ejs';
@@ -177,9 +176,9 @@ export declare namespace Superlogin {
         username: string;
         id: string;
         email: string;
-        emails: {
+        emails: Array<{
             value: string;
-        }[];
+        }>;
     }
     interface IActivity {
         timestamp: string;

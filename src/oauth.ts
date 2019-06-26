@@ -8,9 +8,6 @@ import util from './util'
 
 const debug = d('superlogin')
 
-// tslint:disable-next-line:no-var-requires
-global.Promise = require('bluebird')
-
 const stateRequiredProviders = ['google', 'linkedin']
 
 const oauth = (router: Router, passport: Passport, user: User, config: IConfigure) => {
@@ -270,5 +267,5 @@ const oauth = (router: Router, passport: Passport, user: User, config: IConfigur
 export default oauth
 
 declare global {
-  type Oauth = typeof oauth
+  export type Oauth = typeof oauth
 }

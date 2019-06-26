@@ -38,8 +38,11 @@ declare const configure: (data: Superlogin.IUserConfig, defaults: {
             format: string;
         };
     };
+    mailer: {
+        logger: boolean;
+    };
 }) => IConfigure;
-declare global  {
+declare global {
     interface IConfigure {
         get(): Superlogin.IConfiguration;
         set(setFunc: (oldCfg: Superlogin.IConfiguration) => Superlogin.IConfiguration): void;

@@ -1,84 +1,38 @@
 {
-  "extends": [
-    "tslint:recommended",
-    "tslint-microsoft-contrib",
-    "tslint-eslint-rules",
-    "tslint-config-prettier"
-  ],
+  "extends": ["tslint:recommended", "tslint-etc", "tslint-config-prettier"],
   "rules": {
-    "type-literal-delimiter": false,
-    "no-suspicious-comment": false,
-    "no-parameter-reassignment": false,
-    "no-parameter-properties": false,
-    "no-invalid-this": false,
-    "prefer-type-cast": false,
-    "function-name": false,
-    "no-cookies": false,
-    "completed-docs": false,
-    "match-default-export-name": false,
-    "restrict-plus-operands": false,
-    "no-unsafe-any": false,
-    "no-void-expression": false,
-    "strict-boolean-expressions": false,
-    "no-reserved-keywords": false,
-    "cyclomatic-complexity": false,
-    "no-multiline-string": false,
-    "no-backbone-get-set-outside-model": false,
-    "no-typeof-undefined": false,
-    "no-require-imports": false,
-    "import-name": false,
-    "no-relative-imports": false,
-    "newline-before-return": false,
-    "max-func-body-length": 500,
-    "no-default-export": false,
-    "export-name": false,
-    "missing-jsdoc": false,
-
+    "await-promise": true,
+    "comment-format": true,
+    "interface-name": false,
+    "max-classes-per-file": false,
     "no-console": false,
-    "class-method-newlines": true,
-    "prefer-or-operator-over-ternary": true,
-    "no-implicit-dependencies": false,
-    "member-access": false,
-    "object-literal-sort-keys": false,
-    "variable-name": [
-      true,
-      "allow-snake-case",
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore",
-      "allow-pascal-case"
-    ],
-    "no-any": true,
-    "prefer-object-spread": false,
-    "no-submodule-imports": false,
-    "no-object-literal-type-assertion": true,
-
-    "no-var-keyword": true,
-    "typedef": [
-      false,
-      "call-signature",
-      "parameter",
-      "property-declaration",
-      "member-variable-declaration"
-    ],
-    "triple-equals": [true, "allow-null-check"],
-    "typedef-whitespace": [
+    "no-namespace": false,
+    "member-ordering": [
       true,
       {
-        "call-signature": "nospace",
-        "index-signature": "nospace",
-        "parameter": "nospace",
-        "property-declaration": "nospace",
-        "variable-declaration": "nospace"
+        "order": [
+          "private-static-field",
+          "public-static-field",
+          "private-instance-field",
+          "public-instance-field",
+          "private-constructor",
+          "public-constructor",
+          "private-instance-method",
+          "public-instance-method",
+          "protected-instance-method"
+        ]
       }
     ],
-    "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
-
-    "no-this": false,
-    "no-class": false,
-    "no-expression-statement": false,
-    "no-unused-variable": true,
-    "only-arrow-functions": [true, "allow-declarations"]
-  },
-  "rulesDirectory": ["./node_modules/tslint-misc-rules/rules"]
+    "no-any": true,
+    "no-assign-mutated-array": true,
+    "no-floating-promises": true,
+    "no-unused-declaration": true,
+    "no-unused-variable": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": true,
+    "prefer-for-of": false,
+    "promise-function-async": true,
+    "throw-error": false,
+    "variable-name": false
+  }
 }
