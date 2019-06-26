@@ -13,7 +13,6 @@
     "copy-types": "cd ./tmp && find . -name '*.d.ts' -type f -exec cp --parents {} ../lib/ \\; &&cd ../",
     "precompile": "rimraf lib tmp && tsc",
     "postcompile": "yarn copy-types && rimraf tmp",
-    "postinstall": "patch-package",
     "lint": "yarn tsc && tslint -p tsconfig.json -c tslint.json -t stylish --fix && yarn prettier",
     "prettier": "prettier --write 'src/**/*.ts'",
     "test": "gulp"
