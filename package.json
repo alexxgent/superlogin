@@ -55,6 +55,7 @@
     "pouchdb-upsert": "^2.2.0",
     "redis": "^2.5.2",
     "sofa-model": "^0.2.0",
+    "standard-as-callback": "^2.0.1",
     "superagent": "^5.1.0",
     "urlsafe-base64": "1.0.0",
     "util-promisifyall": "^1.0.6",

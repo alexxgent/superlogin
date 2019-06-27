@@ -4,6 +4,7 @@ import { Request, RequestHandler, Router } from 'express'
 import fs from 'fs'
 import { Passport, Strategy as StrategyType } from 'passport'
 import path from 'path'
+import asCallback from 'standard-as-callback'
 import util from './util'
 
 const debug = d('superlogin')
@@ -212,7 +213,8 @@ const oauth = (router: Router, passport: Passport, user: User, config: IConfigur
     registerProvider(providerName, (credentials, providerPassport, providerAuthHandler) => {
       providerPassport.use(
         new Strategy(credentials, async (req, accessToken, refreshToken, profile, done) =>
-          providerAuthHandler(req, providerName, { accessToken, refreshToken }, profile).asCallback(
+          asCallback(
+            providerAuthHandler(req, providerName, { accessToken, refreshToken }, profile),
             done
           )
         )
@@ -237,7 +239,7 @@ const oauth = (router: Router, passport: Passport, user: User, config: IConfigur
       passport.use(
         `${providerName}-token`,
         new Strategy(finalCreds, async (req, accessToken, refreshToken, profile, done) =>
-          authHandler(req, providerName, { accessToken, refreshToken }, profile).asCallback(done)
+          asCallback(authHandler(req, providerName, { accessToken, refreshToken }, profile), done)
         )
       )
       router.post(
