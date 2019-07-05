@@ -23,7 +23,7 @@ const MemoryAdapter = (): Superlogin.IAdapter => {
     _keys[key] = data
     _expires[key] = now + life
     _removeExpired()
-    return Promise.resolve()
+    return Promise.resolve('OK')
   }
 
   const getKey = async (key: string) => {
@@ -46,9 +46,7 @@ const MemoryAdapter = (): Superlogin.IAdapter => {
     return Promise.resolve(keys.length)
   }
 
-  const quit = async () => {
-    return Promise.resolve()
-  }
+  const quit = async () => Promise.resolve('OK')
 
   return {
     storeKey,

@@ -34,7 +34,7 @@ const local = (config: IConfigure, passport: PassportStatic, user: User) => {
     new BearerStrategy(async (tokenPass: string, done: IDoneFunc) => {
       const parse = tokenPass.split(':')
       if (parse.length < 2) {
-        return done(null, false, { message: 'invalid token' })
+        return done(null, false, { message: `invalid token - length too short: ${parse.length}` })
       }
       const token = parse[0]
       const password = parse[1]
@@ -42,7 +42,7 @@ const local = (config: IConfigure, passport: PassportStatic, user: User) => {
         const thisUser = await user.confirmSession(token, password)
         return done(null, thisUser)
       } catch (error) {
-        console.error('error in local bearer strategy', error)
+        console.error('error in local bearer strategy', error, token, password)
         return done(null, false, { message: error })
       }
     })

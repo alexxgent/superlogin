@@ -67,7 +67,7 @@ declare const user: (config: IConfigure, userDB: PouchDB.Database<Superlogin.IUs
             } | undefined;
             user_id?: string | undefined;
         } | undefined>;
-        quit: () => Promise<void>;
+        quit: () => Promise<string>;
     };
     onCreateActions: ((userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>)[];
     onLinkActions: ((userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>)[];
@@ -216,7 +216,7 @@ declare const user: (config: IConfigure, userDB: PouchDB.Database<Superlogin.IUs
         } | undefined;
         user_id?: string | undefined;
     }>;
-    quitRedis: () => Promise<void>;
+    quitRedis: () => Promise<string>;
 };
 declare global {
     type User = any;

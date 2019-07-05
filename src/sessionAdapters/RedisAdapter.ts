@@ -1,18 +1,9 @@
 import d from 'debug'
-import redis, { RedisClient } from 'redis'
-import promisifyAll from 'util-promisifyall'
+import redis from 'redis'
+import { promisify } from 'util'
 import { Superlogin } from '../types'
 
 const debug = d('superlogin')
-
-interface IPromRedis extends RedisClient {
-  authAsync(pwd: string): Promise<void>
-  psetexAsync(key: string, life: {}, data: {}): Promise<void>
-  delAsync(keys: string[]): Promise<number>
-  getAsync(pwd: string): Promise<string>
-  // tslint:disable-next-line:no-any
-  quit(): any
-}
 
 const RedisAdapter = (config: IConfigure): Superlogin.IAdapter => {
   const { redis: redisConfig } = config.get().session
@@ -20,17 +11,24 @@ const RedisAdapter = (config: IConfigure): Superlogin.IAdapter => {
 
   const { unix_socket, url, port, host, options, password } = finalRedisConfig
 
-  const redisClient = promisifyAll(
-    unix_socket
-      ? (redis.createClient(unix_socket, options) as IPromRedis)
-      : url
-      ? (redis.createClient(url, options) as IPromRedis)
-      : (redis.createClient(port || 6379, host || '127.0.0.1', options) as IPromRedis)
-  )
+  const redisClient = unix_socket
+    ? redis.createClient(unix_socket, options)
+    : url
+    ? redis.createClient(url, options)
+    : redis.createClient(port || 6379, host || '127.0.0.1', options)
+
+  const authAsync = promisify(redisClient.auth).bind(redisClient)
+  const psetexAsync = promisify(redisClient.psetex).bind(redisClient)
+  const delAsync = promisify(redisClient.del as (
+    keys: string[],
+    cb: (e: Error | null, result: number) => void
+  ) => void).bind(redisClient)
+  const getAsync = promisify(redisClient.get).bind(redisClient)
+  const quitAsync = promisify(redisClient.quit).bind(redisClient)
 
   // Authenticate with Redis if necessary
   if (password) {
-    redisClient.authAsync(password).catch((err: string) => {
+    authAsync(password).catch((err: string) => {
       throw new Error(err)
     })
   }
@@ -39,14 +37,13 @@ const RedisAdapter = (config: IConfigure): Superlogin.IAdapter => {
 
   redisClient.on('connect', () => debug('Redis is ready'))
 
-  const storeKey = async (key: string, life: {}, data: {}) =>
-    redisClient.psetexAsync(key, life, data)
+  const storeKey = async (key: string, life: number, data: string) => psetexAsync(key, life, data)
 
-  const deleteKeys = async (keys: string[]) => redisClient.delAsync(keys)
+  const deleteKeys = async (keys: string[]) => delAsync(keys)
 
-  const getKey = async (key: string) => redisClient.getAsync(key)
+  const getKey = async (key: string) => getAsync(key)
 
-  const quit = () => redisClient.quit()
+  const quit = async () => quitAsync()
 
   return {
     storeKey,

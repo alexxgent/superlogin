@@ -9,8 +9,8 @@ export declare namespace Superlogin {
     _removeExpired?(path: string): void
     deleteKeys(keys: string[]): Promise<number>
     getKey(path: string): Promise<string>
-    quit(path?: string): Promise<void>
-    storeKey(key: string, life: number, data: {}): Promise<void>
+    quit(path?: string): Promise<string>
+    storeKey(key: string, life: number, data: string): Promise<string>
   }
 
   export interface ISecurityDoc {
@@ -416,7 +416,7 @@ export declare namespace Superlogin {
       roles: string[]
     }>
     sendEmail(templateName: string, email: string, locals: Data): void
-    quitRedis(): Promise<void>
+    quitRedis(): Promise<string>
     requireRole(requiredRole: string): RequestHandler
     requireAnyRole(possibleRoles: string[]): RequestHandler
     requireAllRoles(requiredRoles: string[]): RequestHandler

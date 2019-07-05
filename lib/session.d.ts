@@ -32,6 +32,6 @@ declare const Session: (config: IConfigure) => {
         } | undefined;
         user_id?: string | undefined;
     } | undefined>;
-    quit: () => Promise<void>;
+    quit: () => Promise<string>;
 };
 export default Session;

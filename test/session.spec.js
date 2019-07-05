@@ -58,7 +58,7 @@ function runTest(config, adapter) {
             return session.confirmToken(testToken.key, testToken.password)
           })
           .then(function(result) {
-            // console.log('stored token');
+            // console.log('stored token', result)
             expect(result.key).to.equal(testToken.key)
             done()
           })
@@ -72,7 +72,7 @@ function runTest(config, adapter) {
           return session
             .confirmToken(testToken.key, testToken.password)
             .then(function(result) {
-              // console.log('confirmed token');
+              // console.log('confirmed token', result)
               expect(result._id).to.equal('colinskow')
               done()
             })
@@ -85,7 +85,7 @@ function runTest(config, adapter) {
       it('should reject an invalid token', function(done) {
         previous.then(function() {
           return session.confirmToken('faketoken', testToken.password).catch(function(err) {
-            // console.log('rejected invalid token');
+            // console.log('rejected invalid token', err)
             expect(err).to.equal('invalid token')
             done()
           })
@@ -95,7 +95,7 @@ function runTest(config, adapter) {
       it('should reject a wrong password', function(done) {
         previous.then(function() {
           return session.confirmToken(testToken.key, 'wrongpass').catch(function(err) {
-            // console.log('rejected invalid token');
+            // console.log('rejected invalid token', err)
             expect(err).to.equal('invalid token')
             done()
           })
@@ -114,7 +114,7 @@ function runTest(config, adapter) {
               throw new Error('failed to delete token')
             })
             .catch(function(err) {
-              // console.log('deleted token');
+              // console.log('deleted token', err)
               expect(err).to.equal('invalid token')
               session.quit()
               done()

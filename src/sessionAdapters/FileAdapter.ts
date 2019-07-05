@@ -49,7 +49,7 @@ const FileAdapter = (config: IConfigure): Superlogin.IAdapter => {
     return done.length
   }
 
-  const quit = async () => Promise.resolve()
+  const quit = async () => Promise.resolve('OK')
 
   const _removeExpired = () => {
     // open all files and check session expire date
