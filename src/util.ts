@@ -1,11 +1,15 @@
-import pwd from 'couch-pwd'
 import crypto from 'crypto'
 import { Request } from 'express'
 import merge from 'lodash.merge'
 import URLSafeBase64 from 'urlsafe-base64'
-import { promisify } from 'util'
 import uuid from 'uuid'
 import { Superlogin } from './types'
+
+const KEY_LEN = 20
+const KEY_SIZE = 16
+const KEY_ITERATIONS = 10
+const KEY_ENCODING = 'hex'
+const KEY_DIGEST = 'SHA1'
 
 const URLSafeUUID = () => URLSafeBase64.encode(uuid.v4(null, new Buffer(16)))
 
@@ -16,40 +20,43 @@ const hashToken = (token: string) =>
     .digest('hex')
 
 const hashPassword = async (password: string) =>
-  new Promise<{ salt: string; derived_key: string }>((resolve, reject) => {
-    pwd.hash(password, (err: string, salt: string, hash: string) => {
-      if (err) {
-        return reject(err)
+  new Promise<{ salt: string; derived_key: string }>((resolve, reject) =>
+    crypto.randomBytes(KEY_SIZE, (err1, baseSalt) => {
+      if (err1) {
+        return reject(err1)
       }
-      return resolve({
-        salt,
-        derived_key: hash
+      const salt = baseSalt.toString('hex')
+      crypto.pbkdf2(password, salt, KEY_ITERATIONS, KEY_LEN, KEY_DIGEST, (err2, hash) => {
+        if (err2) {
+          return reject(err2)
+        }
+        const derived_key = hash.toString(KEY_ENCODING)
+        return resolve({ salt, derived_key })
       })
     })
-  })
+  )
 
 const verifyPassword = async (
-  hashObj: { iterations?: string; salt?: string; derived_key?: string },
+  hashObj: { iterations?: number; salt?: string; derived_key?: string },
   password: string
 ) => {
-  // tslint:disable-next-line:no-any
-  const getHash: any = promisify(pwd.hash)
   const { iterations, salt, derived_key } = hashObj
-  if (iterations) {
-    pwd.iterations(iterations)
-  }
   if (!salt || !derived_key) {
     return Promise.reject(false)
   }
-  const hash: string = await getHash(password, salt)
-  if (
-    hash.length !== derived_key.length ||
-    // Protect against timing attacks
-    hash.split('').findIndex((char, idx) => char !== derived_key[idx]) > -1
-  ) {
-    return Promise.reject(false)
-  }
-  return true
+  return new Promise<boolean>((resolve, reject) =>
+    crypto.pbkdf2(password, salt, iterations || 10, KEY_LEN, KEY_DIGEST, (err, hash) => {
+      if (err) {
+        return reject(false)
+      }
+
+      if (hash.toString(KEY_ENCODING) === derived_key) {
+        return resolve(true)
+      } else {
+        return reject(false)
+      }
+    })
+  )
 }
 
 const getDBURL = ({ user, protocol, host, password }: Superlogin.IConfiguration['dbServer']) =>

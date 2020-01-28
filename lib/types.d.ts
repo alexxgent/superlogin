@@ -211,7 +211,7 @@ export declare namespace Superlogin {
             issued: number;
         };
         local: {
-            iterations?: string;
+            iterations?: number;
             failedLoginAttempts?: number;
             salt?: string;
             derived_key?: string;
@@ -264,7 +264,7 @@ export declare namespace Superlogin {
             derived_key: string;
         }>;
         verifyPassword(hashObj: {
-            iterations?: string | undefined;
+            iterations?: number | undefined;
             salt?: string | undefined;
             derived_key?: string | undefined;
         }, password: string): Promise<boolean>;

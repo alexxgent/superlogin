@@ -8,7 +8,7 @@ declare const _default: {
         derived_key: string;
     }>;
     verifyPassword: (hashObj: {
-        iterations?: string | undefined;
+        iterations?: number | undefined;
         salt?: string | undefined;
         derived_key?: string | undefined;
     }, password: string) => Promise<boolean>;
