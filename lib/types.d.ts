@@ -120,11 +120,10 @@ export declare namespace Superlogin {
         providers: {
             [name: string]: {
                 credentials: {
-                    clientID: string;
-                    clientSecret: string;
+                    [key: string]: any;
                 };
                 options: {
-                    scope: string[];
+                    [key: string]: any;
                 };
                 stateRequired?: boolean;
             };

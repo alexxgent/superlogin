@@ -162,13 +162,14 @@ export declare namespace Superlogin {
         credentials: {
           // Anything under credentials will be passed in to passport.use
           // It is a best practice to put any sensitive credentials in environment variables rather than your code
-          clientID: string
-          clientSecret: string
+          // tslint:disable-next-line:no-any
+          [key: string]: any
         }
         // Any additional options you want to supply your authentication strategy such as requested permissions
         options: {
           // Anything under options will be passed in with passport.authenticate
-          scope: string[]
+          // tslint:disable-next-line:no-any
+          [key: string]: any
         }
         // This will pass in the user's auth token as a variable called 'state' when linking to this provider
         // Defaults to true for Apple, Google, and LinkedIn, but you can enable it for other providers if needed

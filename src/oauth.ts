@@ -61,7 +61,7 @@ const oauth = (router: Router, passport: Passport, user: User, config: IConfigur
   // Operation is 'login' or 'link'
   const passportCallback = (
     provider: string,
-    options: { scope?: string[] },
+    options: {},
     operation: 'login' | 'link'
   ): RequestHandler => (req, res, next) => {
     const stateRequired = isStateRequired(provider)
@@ -77,10 +77,11 @@ const oauth = (router: Router, passport: Passport, user: User, config: IConfigur
   }
 
   // Configures the passport.authenticate for the given access_token provider, passing in options
-  const passportTokenCallback = (
-    provider: string,
-    options: { scope?: string[] }
-  ): RequestHandler => (req, res, next) =>
+  const passportTokenCallback = (provider: string, options: {}): RequestHandler => (
+    req,
+    res,
+    next
+  ) =>
     passport.authenticate(`${provider}-token`, {
       ...options,
       session: false
