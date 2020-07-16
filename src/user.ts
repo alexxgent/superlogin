@@ -2,6 +2,7 @@ import { EventEmitter } from 'events'
 import merge from 'lodash.merge'
 import Model from 'sofa-model'
 import url from 'url'
+
 import DBAuth from './dbAuth'
 import cloudant from './dbAuth/cloudant'
 import Session from './session'
@@ -762,7 +763,7 @@ const user = (
     return finalUser
   }
 
-  const unlink = async (user_id: string, provider: 'local' | 'google') => {
+  const unlink = async (user_id: string, provider: 'apple' | 'local' | 'google') => {
     // We cannot unlink local
     if (provider === 'local') {
       return Promise.reject({

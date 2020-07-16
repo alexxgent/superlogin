@@ -222,6 +222,7 @@ export declare namespace Superlogin {
             timestamp: string;
             ip: string;
         };
+        apple?: {};
         google?: {};
         session: {
             [name: string]: {

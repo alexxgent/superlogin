@@ -5,11 +5,12 @@ import fs from 'fs'
 import { Passport, Strategy as StrategyType } from 'passport'
 import path from 'path'
 import asCallback from 'standard-as-callback'
+
 import util from './util'
 
 const debug = d('superlogin')
 
-const stateRequiredProviders = ['google', 'linkedin']
+const stateRequiredProviders = ['apple', 'google', 'linkedin']
 
 const oauth = (router: Router, passport: Passport, user: User, config: IConfigure) => {
   // Helpers

@@ -171,7 +171,7 @@ export declare namespace Superlogin {
           scope: string[]
         }
         // This will pass in the user's auth token as a variable called 'state' when linking to this provider
-        // Defaults to true for Google and LinkedIn, but you can enable it for other providers if needed
+        // Defaults to true for Apple, Google, and LinkedIn, but you can enable it for other providers if needed
         stateRequired?: boolean
       }
     }
@@ -271,6 +271,7 @@ export declare namespace Superlogin {
       timestamp: string
       ip: string
     }
+    apple?: {}
     google?: {}
     session: { [name: string]: { expires?: number } }
     personalDBs: { [dbName: string]: { name: string; type?: string } }

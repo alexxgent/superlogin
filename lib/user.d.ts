@@ -151,7 +151,7 @@ declare const user: (config: IConfigure, userDB: PouchDB.Database<Superlogin.IUs
     linkSocial: (user_id: string, provider: string, auth: string, profile: Superlogin.IProfile, req: {
         ip: string;
     }) => Promise<Superlogin.IUserDoc>;
-    unlink: (user_id: string, provider: "local" | "google") => Promise<(Superlogin.IUserDoc & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta) | undefined>;
+    unlink: (user_id: string, provider: "local" | "apple" | "google") => Promise<(Superlogin.IUserDoc & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta) | undefined>;
     createSession: (user_id: string, provider: string, req: {
         ip: string;
     }) => Promise<Partial<Superlogin.IUserDoc> | undefined>;
