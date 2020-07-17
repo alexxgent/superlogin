@@ -609,6 +609,9 @@ const user = (
         if (profile.emails) {
           userDoc.email = profile.emails[0].value
         }
+        if (profile.email) {
+          userDoc.email = profile.email
+        }
         userDoc.providers = [provider]
         userDoc.type = 'user'
         userDoc.roles = config.get().security.defaultRoles
@@ -664,7 +667,12 @@ const user = (
       userDoc[provider].auth = auth
       userDoc[provider].profile = profile
       if (!userDoc.name) {
-        userDoc.name = profile.displayName
+        if (profile.displayName) {
+          userDoc.name = profile.displayName
+        }
+        if (profile.name && profile.name.firstName && profile.name.lastName) {
+          userDoc.name = `${profile.name.firstName} ${profile.name.lastName}`
+        }
       }
       delete userDoc[provider].profile._raw
       if (newAccount) {

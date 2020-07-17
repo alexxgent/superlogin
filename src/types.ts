@@ -225,6 +225,7 @@ export declare namespace Superlogin {
 
   interface IProfile {
     [key: string]: {}
+    name: { firstName: string; lastName: string }
     displayName: string
     username: string
     id: string
