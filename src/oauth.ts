@@ -193,6 +193,11 @@ const oauth = (router: Router, passport: Passport, user: User, config: IConfigur
       configFunction(finalCreds, passport, authHandler)
       router.get(`/${provider}`, passportCallback(provider, options, 'login'))
       router.get(`/${provider}/callback`, passportCallback(provider, options, 'login'), initSession)
+      router.post(
+        `/${provider}/callback`,
+        passportCallback(provider, options, 'login'),
+        initSession
+      )
       if (!config.get().security.disableLinkAccounts) {
         router.get(
           `/link/${provider}`,
