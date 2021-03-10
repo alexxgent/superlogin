@@ -7,29 +7,41 @@
   </head>
   <body>
     <script type="text/javascript">
-        var session = <%- JSON.stringify(session) %>;
-        var error = <%- JSON.stringify(error) %>;
-        var link = <%- JSON.stringify(link) %>;
-          if (window.opener) {
-              window.opener.postMessage({
-                  type: 'oauthSession',
-                  session: session,
-                  error: error,
-                  link: link
-              }, '*'); // original referer would be better
-              setTimeout(window.close, 100);
-          }
-          window.addEventListener("message", function(ev) {
-          if (ev.data.message === "requestResult") {
-              // ev.source is the opener
-              ev.source.postMessage({
-                  type: 'oauthSession',
-                  session: session,
-                  error: error,
-                  link: link
-              }, "*");
-          }
+      var session = <%- JSON.stringify(session) %>;
+      var error = <%- JSON.stringify(error) %>;
+      var link = <%- JSON.stringify(link) %>;
+
+      window.addEventListener("message", function(ev) {
+        if (ev.data.message === "requestResult") {
+            // ev.source is the opener
+            ev.source.postMessage({
+                type: 'oauthSession',
+                session: session,
+                error: error,
+                link: link
+            }, "*");
+        }
       });
+
+      if (typeof window.opener !== 'undefined') {
+        window.opener.postMessage({
+            type: 'oauthSession',
+            session: session,
+            error: error,
+            link: link
+        }, '*'); // original referer would be better
+        setTimeout(window.close, 100);
+
+      } else {
+        console.log("window.opener is undefined!")
+        window.postMessage({
+              type: 'oauthSession',
+              session: session,
+              error: error,
+              link: link
+          }, '*');
+
+      }
     </script>
   </body>
 </html>
