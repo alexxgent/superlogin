@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <title>Authentication <%= error ? 'Failed' : 'Success' %></title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-</head>
-<body>
-<script type="text/javascript">
-    if (window.opener) {
-        window.opener.focus();
+  </head>
+  <body>
+    <script type="text/javascript">
         var session = <%- JSON.stringify(session) %>;
         var error = <%- JSON.stringify(error) %>;
         var link = <%- JSON.stringify(link) %>;
-        window.opener.postMessage({
-            type: 'oauthSession',
-            session: session,
-            error: error,
-            link: link
-        }, '*'); // original referer would be better
-    }
-    window.close();
-</script>
-</body>
+          if (window.opener) {
+              window.opener.postMessage({
+                  type: 'oauthSession',
+                  session: session,
+                  error: error,
+                  link: link
+              }, '*'); // original referer would be better
+              setTimeout(window.close, 100);
+          }
+          window.addEventListener("message", function(ev) {
+          if (ev.data.message === "requestResult") {
+              // ev.source is the opener
+              ev.source.postMessage({
+                  type: 'oauthSession',
+                  session: session,
+                  error: error,
+                  link: link
+              }, "*");
+          }
+      });
+    </script>
+  </body>
 </html>

@@ -220,8 +220,10 @@ describe('User Model', function() {
         return userTestDB.get('_security')
       })
       .then(function(secDoc) {
-        expect(secDoc.admins.roles[0]).to.equal('admin_role')
-        expect(secDoc.members.roles[0]).to.equal('member_role')
+        expect(secDoc.admins.roles[0]).to.equal('_admin')
+        expect(secDoc.admins.roles[1]).to.equal('admin_role')
+        expect(secDoc.members.roles[0]).to.equal('_admin')
+        expect(secDoc.members.roles[1]).to.equal('member_role')
       })
   })
 

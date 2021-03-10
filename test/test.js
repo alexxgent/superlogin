@@ -41,15 +41,14 @@ describe('SuperLogin', function() {
     confirmPassword: '1s3cret'
   }
 
-  before(function() {
+  before(async () => {
     userDB = new PouchDB(dbUrl + '/sl_test-users')
     keysDB = new PouchDB(dbUrl + '/sl_test-keys')
-    require('./test-server')(config).then(sl => {
-      app = sl
-      app.superlogin.onCreate(function(userDoc, provider) {
-        userDoc.profile = { name: userDoc.name }
-        return Promise.resolve(userDoc)
-      })
+    const newSuperLogin = require('./test-server')
+    app = await newSuperLogin(config)
+    app.superlogin.onCreate(function(userDoc, provider) {
+      userDoc.profile = { name: userDoc.name }
+      return Promise.resolve(userDoc)
     })
 
     previous = seed(userDB, require('../designDocs/user-design'))
