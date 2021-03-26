@@ -206,7 +206,7 @@ export declare namespace Superlogin {
         activity?: IActivity[] | IActivity;
         _rev: string;
         rev?: string;
-        unverifiedEmail: {
+        unverifiedEmail?: {
             email: string;
             token: string;
         };
