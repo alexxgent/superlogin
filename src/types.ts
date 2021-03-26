@@ -235,7 +235,7 @@ export declare namespace Superlogin {
     [key: string]: {}
     name: { firstName: string; lastName: string }
     displayName: string
-    username: string
+    username?: string
     id: string
     email: string
     emails: Array<{ value: string }>

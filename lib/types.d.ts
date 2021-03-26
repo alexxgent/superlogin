@@ -184,7 +184,7 @@ export declare namespace Superlogin {
             lastName: string;
         };
         displayName: string;
-        username: string;
+        username?: string;
         id: string;
         email: string;
         emails: Array<{
