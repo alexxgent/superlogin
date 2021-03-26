@@ -267,7 +267,7 @@ export declare namespace Superlogin {
     displayName?: string
     companyName?: string
     providers?: string[]
-    profile: Profile
+    profile?: Profile
     userDBs: Record<string, string>
     forgotPassword?: {
       expires: number
