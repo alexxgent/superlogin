@@ -206,12 +206,12 @@ export declare namespace Superlogin {
             email: string;
             token: string;
         };
-        password: string;
-        confirmPassword: string;
+        password?: string;
+        confirmPassword?: string;
         name: string;
         email: string;
         _id: string;
-        type: string;
+        type?: string;
         roles: string[];
         displayName?: string;
         companyName?: string;
