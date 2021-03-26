@@ -289,12 +289,12 @@ export declare namespace Superlogin {
     personalDBs: { [dbName: string]: { name: string; type?: string } }
   }
 
-  interface IBaseSLInstance {
+  interface IBaseSLInstance<Profile extends IProfile = IProfile> {
     config: IConfigure
     router: Router
     mailer: IMailer
     passport: PassportStatic
-    userDB: PouchDB.Database<IUserDoc>
+    userDB: PouchDB.Database<IUserDoc<Profile>>
     couchAuthDB: PouchDB.Database | undefined
     requireAuth: RequestHandler
     removeExpiredKeys(): Promise<undefined | string[]>
@@ -307,15 +307,17 @@ export declare namespace Superlogin {
     validateUsername(username: string): Promise<string | void>
     validateEmail(email: string): Promise<string | void>
     validateEmailUsername(email: string): Promise<string | void>
-    getUser(login: string): Promise<PouchDB.Core.ExistingDocument<IUserDoc> | null | undefined>
+    getUser(
+      login: string
+    ): Promise<PouchDB.Core.ExistingDocument<IUserDoc<Profile>> | null | undefined>
     createUser(
       form: {},
       req: {
         ip: string
       }
-    ): Promise<IUserDoc>
-    onCreate(fn: (userDoc: IUserDoc, provider: string) => Promise<IUserDoc>): void
-    onLink(fn: (userDoc: IUserDoc, provider: string) => Promise<IUserDoc>): void
+    ): Promise<IUserDoc<Profile>>
+    onCreate(fn: (userDoc: IUserDoc<Profile>, provider: string) => Promise<IUserDoc<Profile>>): void
+    onLink(fn: (userDoc: IUserDoc<Profile>, provider: string) => Promise<IUserDoc<Profile>>): void
     socialAuth(
       provider: string,
       auth: string,
@@ -323,7 +325,7 @@ export declare namespace Superlogin {
       req: {
         ip: string
       }
-    ): Promise<IUserDoc | undefined>
+    ): Promise<IUserDoc<Profile> | undefined>
     hashPassword(
       password: string
     ): Promise<{
@@ -344,11 +346,11 @@ export declare namespace Superlogin {
       req: {
         ip: string
       }
-    ): Promise<Partial<IUserDoc> | undefined>
+    ): Promise<Partial<IUserDoc<Profile>> | undefined>
     changePassword(
       user_id: string,
       newPassword: string,
-      userDoc: IUserDoc,
+      userDoc: IUserDoc<Profile>,
       req: {
         ip: string
       }
@@ -362,7 +364,7 @@ export declare namespace Superlogin {
         }
         ip: string
       }
-    ): Promise<IUserDoc | undefined>
+    ): Promise<IUserDoc<Profile> | undefined>
     resetPassword(
       form: {
         token: string
@@ -397,7 +399,7 @@ export declare namespace Superlogin {
       type: string,
       designDocs?: string[],
       permissions?: string[]
-    ): Promise<(IUserDoc & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta) | undefined>
+    ): Promise<(IUserDoc<Profile> & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta) | undefined>
     removeUserDB(
       user_id: string,
       dbName: string,

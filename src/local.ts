@@ -2,20 +2,29 @@ import { Request } from 'express'
 import { PassportStatic } from 'passport'
 import Bearer from 'passport-http-bearer-sl'
 import LocalStrategy from 'passport-local'
+
 import { Superlogin } from './types'
 import util from './util'
 
 const BearerStrategy = Bearer.Strategy
 
-type IDoneFunc = (
+type IDoneFunc = <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
   sth: {} | null,
-  sth2?: boolean | Superlogin.IUserDoc,
+  sth2?: boolean | Superlogin.IUserDoc<Profile>,
   sth3?: { error?: string; message: string }
 ) => void
 
-const local = (config: IConfigure, passport: PassportStatic, user: User) => {
+const local = <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
+  config: IConfigure,
+  passport: PassportStatic,
+  user: User
+) => {
   const { usernameField, passwordField, requireEmailConfirm } = config.get().local
-  const handleFailedLogin = async (userDoc: Superlogin.IUserDoc, req: Request, done: IDoneFunc) => {
+  const handleFailedLogin = async (
+    userDoc: Superlogin.IUserDoc<Profile>,
+    req: Request,
+    done: IDoneFunc
+  ) => {
     try {
       const locked = await user.handleFailedLogin(userDoc, req)
       const message = locked

@@ -4,7 +4,12 @@ import { Passport } from 'passport'
 import { Superlogin } from './types'
 import util from './util'
 
-const routes = (config: IConfigure, router: Router, passport: Passport, user: User) => {
+const routes = <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
+  config: IConfigure,
+  router: Router,
+  passport: Passport,
+  user: User
+) => {
   router.post(
     '/login',
     (req, res, next) => {
@@ -86,7 +91,7 @@ const routes = (config: IConfigure, router: Router, passport: Passport, user: Us
 
   // Setting up the auth api
   router.post('/register', (req, res, next) => {
-    user.create(req.body, req).then((newUser: Superlogin.IUserDoc) => {
+    user.create(req.body, req).then((newUser: Superlogin.IUserDoc<Profile>) => {
       if (config.get().security.loginOnRegistration) {
         return user
           .createSession(newUser._id, 'local', req.ip)
@@ -103,7 +108,7 @@ const routes = (config: IConfigure, router: Router, passport: Passport, user: Us
   )
 
   router.post('/password-reset', (req, res, next) => {
-    user.resetPassword(req.body, req).then((currentUser: Superlogin.IUserDoc) => {
+    user.resetPassword(req.body, req).then((currentUser: Superlogin.IUserDoc<Profile>) => {
       if (config.get().security.loginOnPasswordReset) {
         return user
           .createSession(currentUser._id, 'local', req.ip)

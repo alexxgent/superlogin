@@ -3,6 +3,7 @@ import { Request } from 'express'
 import merge from 'lodash.merge'
 import URLSafeBase64 from 'urlsafe-base64'
 import uuid from 'uuid'
+
 import { Superlogin } from './types'
 
 const KEY_LEN = 20
@@ -70,9 +71,14 @@ const getFullDBURL = (dbServer: Superlogin.IConfiguration['dbServer'], dbName: s
 // tslint:disable-next-line:no-any
 const toArray = <T>(obj: T | T[]): T[] => (Array.isArray(obj) ? obj : [obj])
 
-const getSessions = ({ session }: Superlogin.IUserDoc) => (session ? Object.keys(session) : [])
+const getSessions = <Profile extends Superlogin.IProfile = Superlogin.IProfile>({
+  session
+}: Superlogin.IUserDoc<Profile>) => (session ? Object.keys(session) : [])
 
-const getExpiredSessions = ({ session }: Superlogin.IUserDoc, now: number) =>
+const getExpiredSessions = <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
+  { session }: Superlogin.IUserDoc<Profile>,
+  now: number
+) =>
   session
     ? Object.keys(session).filter(k => {
         const thisSession = session[k]

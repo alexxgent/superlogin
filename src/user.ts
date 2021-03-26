@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events'
-import { IProfile } from 'index'
 import merge from 'lodash.merge'
 import Model from 'sofa-model'
 import url from 'url'
@@ -14,7 +13,7 @@ import util from './util'
 const EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/
 const USER_REGEXP = /^[a-z0-9_-]{3,16}$/
 
-const user = <Profile extends IProfile = IProfile>(
+const user = <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
   config: IConfigure,
   userDB: PouchDB.Database<Superlogin.IUserDoc<Profile>>,
   couchAuthDB: PouchDB.Database,
