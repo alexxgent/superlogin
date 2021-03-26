@@ -225,7 +225,7 @@ export declare namespace Superlogin {
             token: string;
             issued: number;
         };
-        local: {
+        local?: {
             iterations?: number;
             failedLoginAttempts?: number;
             salt?: string;
