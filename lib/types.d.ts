@@ -197,6 +197,7 @@ export declare namespace Superlogin {
         provider: string;
         ip: string;
     }
+    type UserDocSession = Pick<ISession, 'issued' | 'expires' | 'provider' | 'ip'>;
     interface IUserDoc {
         activity?: IActivity[] | IActivity;
         _rev: string;
@@ -208,7 +209,7 @@ export declare namespace Superlogin {
         password: string;
         confirmPassword: string;
         name: string;
-        email?: string;
+        email: string;
         _id: string;
         type: string;
         roles: string[];
@@ -236,9 +237,7 @@ export declare namespace Superlogin {
         apple?: {};
         google?: {};
         session?: {
-            [name: string]: {
-                expires?: number;
-            };
+            [name: string]: UserDocSession;
         };
         personalDBs: {
             [dbName: string]: {

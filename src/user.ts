@@ -829,7 +829,6 @@ const user = (
   const createSession = async (user_id: string, provider: string, req: { ip?: string }) => {
     let createSessionUser: Superlogin.IUserDoc
     let newToken: Superlogin.ISession
-    let newSession: Partial<Superlogin.ISession>
     let password: string
     req = req || {}
     const { ip } = req
@@ -864,13 +863,13 @@ const user = (
       if (!createSessionUser.session) {
         createSessionUser.session = {}
       }
-      newSession = {
+      const userDocSession = {
         issued: newToken.issued,
         expires: newToken.expires,
         provider,
         ip
       }
-      createSessionUser.session[newToken.key] = newSession
+      createSessionUser.session[newToken.key] = userDocSession
       // Clear any failed login attempts
       if (provider === 'local') {
         if (!createSessionUser.local) {
@@ -897,10 +896,14 @@ const user = (
         return merge({}, oldDoc, finalUser)
       })
 
-      newSession.token = newToken.key
-      newSession.password = password
-      newSession.user_id = createSessionUser._id
-      newSession.roles = createSessionUser.roles
+      const finalSession: Partial<Superlogin.ISession> = {
+        ...userDocSession
+      }
+
+      finalSession.token = newToken.key
+      finalSession.password = password
+      finalSession.user_id = createSessionUser._id
+      finalSession.roles = createSessionUser.roles
       // Inject the list of userDBs
       if (typeof createSessionUser.personalDBs === 'object') {
         const userDBs = {}
@@ -908,23 +911,23 @@ const user = (
         const configPublicURL = config.get().dbServer.publicURL
         if (configPublicURL) {
           const dbObj = url.parse(configPublicURL)
-          dbObj.auth = `${newSession.token}:${newSession.password}`
+          dbObj.auth = `${finalSession.token}:${finalSession.password}`
           publicURL = url.format(dbObj)
         } else {
-          publicURL = `${config.get().dbServer.protocol}${newSession.token}:${
-            newSession.password
+          publicURL = `${config.get().dbServer.protocol}${finalSession.token}:${
+            finalSession.password
           }@${config.get().dbServer.host}/`
         }
         Object.keys(createSessionUser.personalDBs).forEach(finalDBName => {
           userDBs[createSessionUser.personalDBs[finalDBName].name] = `${publicURL}${finalDBName}`
         })
-        newSession.userDBs = userDBs
+        finalSession.userDBs = userDBs
       }
       if (createSessionUser.profile) {
-        newSession.profile = createSessionUser.profile
+        finalSession.profile = createSessionUser.profile
       }
-      emitter.emit('login', newSession, provider)
-      return newSession
+      emitter.emit('login', finalSession, provider)
+      return finalSession
     } catch (error) {
       console.error('failed creating a user session', error)
       return undefined
