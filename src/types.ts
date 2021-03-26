@@ -437,7 +437,8 @@ export declare namespace Superlogin {
     requireAllRoles(requiredRoles: string[]): RequestHandler
   }
 
-  export interface ISLInstance extends IBaseSLInstance {
+  export interface ISLInstance<Profile extends IProfile = IProfile>
+    extends IBaseSLInstance<Profile> {
     on(event: string, cb: {}): void
   }
 }

@@ -28,7 +28,7 @@ export type IAdapter = Superlogin.IAdapter
 export type IBaseSLInstance = Superlogin.IBaseSLInstance
 export type IConfiguration = Superlogin.IConfiguration
 export type IProfile = Superlogin.IProfile
-export type ISLInstance = Superlogin.ISLInstance
+export type ISLInstance<Profile extends IProfile = IProfile> = Superlogin.ISLInstance<Profile>
 export type ISecurityDoc = Superlogin.ISecurityDoc
 export type ISession = Superlogin.ISession
 export type IUserConfig = Superlogin.IUserConfig
@@ -135,7 +135,7 @@ const init = async <Profile extends IProfile = IProfile>(
   for (const key in emitter) {
     superlogin[key] = emitter[key]
   }
-  return superlogin as Superlogin.ISLInstance
+  return superlogin as Superlogin.ISLInstance<Profile>
 }
 
 export default init
