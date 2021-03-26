@@ -211,14 +211,14 @@ export declare namespace Superlogin {
         password?: string;
         confirmPassword?: string;
         name?: string;
-        email?: string;
+        email: string;
         _id: string;
         type?: string;
         roles: string[];
         displayName?: string;
         companyName?: string;
         providers?: string[];
-        profile?: Profile;
+        profile: Profile;
         userDBs: Record<string, string>;
         forgotPassword?: {
             expires: number;
