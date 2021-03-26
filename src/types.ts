@@ -238,7 +238,7 @@ export declare namespace Superlogin {
     username?: string
     id?: string
     email: string
-    emails?: Array<{ value: string }>
+    emails?: Array<{ value?: string }>
   }
 
   interface IActivity {

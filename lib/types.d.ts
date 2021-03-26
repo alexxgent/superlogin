@@ -190,7 +190,7 @@ export declare namespace Superlogin {
         id?: string;
         email: string;
         emails?: Array<{
-            value: string;
+            value?: string;
         }>;
     }
     interface IActivity {
