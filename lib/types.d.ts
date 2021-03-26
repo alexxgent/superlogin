@@ -178,7 +178,6 @@ export declare namespace Superlogin {
         profile?: Superlogin.IProfile;
     }
     interface IProfile {
-        [key: string]: {};
         name?: {
             firstName?: string;
             lastName?: string;
