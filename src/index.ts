@@ -1,11 +1,12 @@
-import { Data } from 'ejs'
+import { Data as EJSData } from 'ejs'
 import events from 'events'
 import express, { Router } from 'express'
-import defaultPassport, { PassportStatic, Strategy } from 'passport'
+import defaultPassport, { PassportStatic, Strategy as PassportStrategy } from 'passport'
 import PouchDB from 'pouchdb-node'
 import PouchSecurity from 'pouchdb-security-helper'
 import seed from 'pouchdb-seed-design'
 import PouchUpsert from 'pouchdb-upsert'
+
 import defaultConfig from './config/default.config'
 import Configure from './configure'
 import localConfig from './local'
@@ -21,7 +22,7 @@ import util from './util'
 const userDesign = require('../designDocs/user-design')
 
 export type DBType = Superlogin.DBType
-export type Data = Data
+export type Data = EJSData
 export type IActivity = Superlogin.IActivity
 export type IAdapter = Superlogin.IAdapter
 export type IBaseSLInstance = Superlogin.IBaseSLInstance
@@ -31,15 +32,15 @@ export type ISLInstance = Superlogin.ISLInstance
 export type ISecurityDoc = Superlogin.ISecurityDoc
 export type ISession = Superlogin.ISession
 export type IUserConfig = Superlogin.IUserConfig
-export type IUserDoc = Superlogin.IUserDoc
-export type Strategy = Strategy
+export type IUserDoc<Profile extends IProfile = IProfile> = Superlogin.IUserDoc<Profile>
+export type Strategy = PassportStrategy
 
 PouchDB.plugin(PouchSecurity).plugin(PouchUpsert)
 
-const init = async (
+const init = async <Profile extends IProfile = IProfile>(
   configData: Superlogin.IUserConfig,
   passport?: PassportStatic,
-  userDB?: PouchDB.Database<IUserDoc>,
+  userDB?: PouchDB.Database<IUserDoc<Profile>>,
   couchAuthDB?: PouchDB.Database
 ) => {
   const config = Configure(configData, defaultConfig)

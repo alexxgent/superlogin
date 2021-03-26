@@ -249,7 +249,8 @@ export declare namespace Superlogin {
 
   type UserDocSession = Pick<ISession, 'issued' | 'expires' | 'provider' | 'ip'>
 
-  interface IUserDoc {
+  interface IUserDoc<Profile extends IProfile = IProfile> {
+    user_id?: string
     activity?: IActivity[] | IActivity
     _rev: string
     rev?: string
@@ -264,7 +265,7 @@ export declare namespace Superlogin {
     displayName?: string
     companyName?: string
     providers: string[]
-    profile: IProfile
+    profile: Profile
     forgotPassword?: {
       expires: number
       token: string

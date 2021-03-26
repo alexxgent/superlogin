@@ -14,11 +14,11 @@ declare const dbAuth: (config: IConfigure, userDB: PouchDB.Database<{}>, couchAu
     };
     getDesignDoc: (docName: string) => any;
     removeExpiredKeys: () => Promise<string[]>;
-    addUserDB: (userDoc: Superlogin.IUserDoc, dbName: string, designDocs?: string[], type?: string, permissions?: string[], aRoles?: string[], mRoles?: string[]) => Promise<string>;
+    addUserDB: (userDoc: Superlogin.IUserDoc<Superlogin.IProfile>, dbName: string, designDocs?: string[], type?: string, permissions?: string[], aRoles?: string[], mRoles?: string[]) => Promise<string>;
     authorizeUserSessions: (user_id: string, personalDBs: {}, keys: string | string[], roles: string[]) => Promise<(boolean | void)[]>;
     authorizeKeys: (user_id: string, db: PouchDB.Database<{}>, keys: string[], permissions?: string[], roles?: string[]) => Promise<boolean | void>;
     deauthorizeKeys: (db: PouchDB.Database<{}>, keys: string | string[]) => Promise<boolean | void>;
-    deauthorizeUser: (userDoc: Superlogin.IUserDoc, keys: string | string[]) => Promise<false | (boolean | void)[]>;
+    deauthorizeUser: (userDoc: Superlogin.IUserDoc<Superlogin.IProfile>, keys: string | string[]) => Promise<false | (boolean | void)[]>;
     removeKeys: (keys: string | string[]) => Promise<boolean | PouchDB.Core.Response[] | PouchDB.Core.Error[]>;
     storeKey: (username: string, key: string, password: string, expires?: number, roles?: string[]) => Promise<void | {
         _id: string;

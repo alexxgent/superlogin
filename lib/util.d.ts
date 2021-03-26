@@ -34,8 +34,8 @@ declare const _default: {
         userDB: string;
         couchAuthDB: string;
     }, dbName: string) => string;
-    getSessions: ({ session }: Superlogin.IUserDoc) => string[];
-    getExpiredSessions: ({ session }: Superlogin.IUserDoc, now: number) => string[];
+    getSessions: ({ session }: Superlogin.IUserDoc<Superlogin.IProfile>) => string[];
+    getExpiredSessions: ({ session }: Superlogin.IUserDoc<Superlogin.IProfile>, now: number) => string[];
     getSessionToken: (req: Request) => string;
     addProvidersToDesignDoc: (config: IConfigure, ddoc: {
         auth: {

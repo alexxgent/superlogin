@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import { IProfile } from 'index'
 import merge from 'lodash.merge'
 import Model from 'sofa-model'
 import url from 'url'
@@ -13,9 +14,9 @@ import util from './util'
 const EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/
 const USER_REGEXP = /^[a-z0-9_-]{3,16}$/
 
-const user = (
+const user = <Profile extends IProfile = IProfile>(
   config: IConfigure,
-  userDB: PouchDB.Database<Superlogin.IUserDoc>,
+  userDB: PouchDB.Database<Superlogin.IUserDoc<Profile>>,
   couchAuthDB: PouchDB.Database,
   mailer: Superlogin.IMailer,
   emitter: EventEmitter
@@ -23,10 +24,16 @@ const user = (
   const dbAuth = DBAuth(config, userDB, couchAuthDB)
   const session = Session(config)
   const onCreateActions: Array<
-    (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+    (
+      userDoc: Superlogin.IUserDoc<Profile>,
+      provider: string
+    ) => Promise<Superlogin.IUserDoc<Profile>>
   > = []
   const onLinkActions: Array<
-    (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+    (
+      userDoc: Superlogin.IUserDoc<Profile>,
+      provider: string
+    ) => Promise<Superlogin.IUserDoc<Profile>>
   > = []
 
   // Token valid for 24 hours by default
@@ -42,7 +49,7 @@ const user = (
     action: string,
     provider: string,
     req: { ip?: string },
-    userDoc: Superlogin.IUserDoc,
+    userDoc: Superlogin.IUserDoc<Profile>,
     saveDoc?: boolean
   ) => {
     try {
@@ -72,8 +79,10 @@ const user = (
       }
 
       if (saveDoc) {
-        await userDB.upsert<Superlogin.IUserDoc>(thisUser._id, oldUser => {
-          const { activity: _, ...oldData } = oldUser as PouchDB.Core.Document<Superlogin.IUserDoc>
+        await userDB.upsert<Superlogin.IUserDoc<Profile>>(thisUser._id, oldUser => {
+          const { activity: _, ...oldData } = oldUser as PouchDB.Core.Document<
+            Superlogin.IUserDoc<Profile>
+          >
           return merge({}, oldData, finalUser)
         })
       }
@@ -84,7 +93,7 @@ const user = (
   }
 
   const logoutUserSessions = async (
-    userDoc: Superlogin.IUserDoc,
+    userDoc: Superlogin.IUserDoc<Profile>,
     op: string,
     currentSession?: string
   ) => {
@@ -127,15 +136,15 @@ const user = (
   const changePassword = async (
     user_id: string,
     newPassword: string,
-    userDoc: Superlogin.IUserDoc,
+    userDoc: Superlogin.IUserDoc<Profile>,
     req: { ip?: string }
   ) => {
     req = req || {}
-    let changePwUser: Superlogin.IUserDoc
+    let changePwUser: Superlogin.IUserDoc<Profile>
     let doc = userDoc
     try {
       if (!userDoc) {
-        doc = await userDB.get<Superlogin.IUserDoc>(user_id)
+        doc = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
       }
     } catch (error) {
       return Promise.reject({
@@ -166,25 +175,29 @@ const user = (
   }
 
   const logoutOthers = async (session_id: string) => {
-    let logoutUserDoc: Superlogin.IUserDoc
-    let finalUser: Superlogin.IUserDoc | undefined
+    let logoutUserDoc: Superlogin.IUserDoc<Profile>
+    let finalUser: Superlogin.IUserDoc<Profile> | undefined
     try {
-      const results = await userDB.query<Superlogin.IUserDoc>('auth/session', {
+      const results = await userDB.query<Superlogin.IUserDoc<Profile>>('auth/session', {
         key: session_id,
         include_docs: true
       })
 
       if (results.rows.length) {
-        logoutUserDoc = results.rows[0].doc as Superlogin.IUserDoc
+        logoutUserDoc = results.rows[0].doc as Superlogin.IUserDoc<Profile>
         if (logoutUserDoc.session && logoutUserDoc.session[session_id]) {
           finalUser = await logoutUserSessions(logoutUserDoc, 'other', session_id)
         }
       }
 
       if (finalUser) {
-        return userDB.upsert<Superlogin.IUserDoc>(finalUser._id, rawUser => {
-          const { session: _, ...oldUser } = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc>
-          return (finalUser ? merge({}, oldUser, finalUser) : oldUser) as Superlogin.IUserDoc
+        return userDB.upsert<Superlogin.IUserDoc<Profile>>(finalUser._id, rawUser => {
+          const { session: _, ...oldUser } = rawUser as PouchDB.Core.Document<
+            Superlogin.IUserDoc<Profile>
+          >
+          return (finalUser ? merge({}, oldUser, finalUser) : oldUser) as Superlogin.IUserDoc<
+            Profile
+          >
         })
       }
       return false
@@ -194,7 +207,7 @@ const user = (
     }
   }
 
-  const addUserDBs = async (newUser: Superlogin.IUserDoc) => {
+  const addUserDBs = async (newUser: Superlogin.IUserDoc<Profile>) => {
     const { userDBs } = config.get()
     // Add personal DBs
     if (!userDBs || !userDBs.defaultDBs) {
@@ -461,7 +474,10 @@ const user = (
   }
 
   const onCreate = (
-    fn: (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+    fn: (
+      userDoc: Superlogin.IUserDoc<Profile>,
+      provider: string
+    ) => Promise<Superlogin.IUserDoc<Profile>>
   ) => {
     if (typeof fn === 'function') {
       onCreateActions.push(fn)
@@ -471,7 +487,10 @@ const user = (
   }
 
   const onLink = (
-    fn: (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+    fn: (
+      userDoc: Superlogin.IUserDoc<Profile>,
+      provider: string
+    ) => Promise<Superlogin.IUserDoc<Profile>>
   ) => {
     if (typeof fn === 'function') {
       onLinkActions.push(fn)
@@ -482,9 +501,12 @@ const user = (
 
   const processTransformations = async (
     fnArray: Array<
-      (userDoc: Superlogin.IUserDoc, provider: string) => Promise<Superlogin.IUserDoc>
+      (
+        userDoc: Superlogin.IUserDoc<Profile>,
+        provider: string
+      ) => Promise<Superlogin.IUserDoc<Profile>>
     >,
-    userDoc: Superlogin.IUserDoc,
+    userDoc: Superlogin.IUserDoc<Profile>,
     provider: string
   ) => {
     let finalDoc = userDoc
@@ -499,7 +521,7 @@ const user = (
     } else {
       query = EMAIL_REGEXP.test(login) ? 'email' : 'username'
     }
-    const results = await userDB.query<Superlogin.IUserDoc>(`auth/${query}`, {
+    const results = await userDB.query<Superlogin.IUserDoc<Profile>>(`auth/${query}`, {
       key: login,
       include_docs: true
     })
@@ -524,7 +546,7 @@ const user = (
     }
     const UserModel = new Model(finalUserModel)
     const u = new UserModel(form)
-    let newUser: Superlogin.IUserDoc
+    let newUser: Superlogin.IUserDoc<Profile>
     try {
       newUser = await u.process()
       if (emailUsername) {
@@ -583,10 +605,10 @@ const user = (
   const socialAuth = async (
     provider: string,
     auth: string,
-    profile: Superlogin.IProfile,
+    profile: Profile,
     req: { ip?: string }
   ) => {
-    let userDoc: Superlogin.IUserDoc
+    let userDoc: Superlogin.IUserDoc<Profile>
     let newAccount = false
     let action: string
     let baseUsername: string
@@ -601,7 +623,7 @@ const user = (
       })
 
       if (results.rows.length > 0) {
-        userDoc = results.rows[0].doc as Superlogin.IUserDoc
+        userDoc = results.rows[0].doc as Superlogin.IUserDoc<Profile>
       } else {
         newAccount = true
         // tslint:disable-next-line:no-any
@@ -705,11 +727,11 @@ const user = (
     user_id: string,
     provider: string,
     auth: string,
-    profile: Superlogin.IProfile,
+    profile: Profile,
     req: { ip?: string }
   ) => {
     req = req || {}
-    let linkUser: Superlogin.IUserDoc
+    let linkUser: Superlogin.IUserDoc<Profile>
     const results = await userDB.query(`auth/${provider}`, { key: profile.id })
 
     if (results.rows.length > 0 && results.rows[0].id !== user_id) {
@@ -719,7 +741,7 @@ const user = (
         status: 409
       })
     }
-    const theUser = await userDB.get<Superlogin.IUserDoc>(user_id)
+    const theUser = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
 
     linkUser = theUser
     // Check for conflicting provider
@@ -786,7 +808,7 @@ const user = (
       })
     }
     try {
-      let unLinkUser = await userDB.get<Superlogin.IUserDoc>(user_id)
+      let unLinkUser = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
       if (!provider) {
         return Promise.reject({
           error: 'Unlink failed',
@@ -815,14 +837,14 @@ const user = (
           status: 404
         })
       }
-      await userDB.upsert<Superlogin.IUserDoc>(unLinkUser._id, oldUser => {
+      await userDB.upsert<Superlogin.IUserDoc<Profile>>(unLinkUser._id, oldUser => {
         const { [provider]: deleted, ...newUser } = oldUser
         if (newUser.providers) {
           // Remove the unlinked provider from the list of providers
           newUser.providers.splice(unLinkUser.providers.indexOf(provider), 1)
         }
-        unLinkUser = newUser as Superlogin.IUserDoc
-        return newUser as Superlogin.IUserDoc
+        unLinkUser = newUser as Superlogin.IUserDoc<Profile>
+        return newUser as Superlogin.IUserDoc<Profile>
       })
       return unLinkUser
     } catch (error) {
@@ -832,13 +854,13 @@ const user = (
   }
 
   const createSession = async (user_id: string, provider: string, req: { ip?: string }) => {
-    let createSessionUser: Superlogin.IUserDoc
+    let createSessionUser: Superlogin.IUserDoc<Profile>
     let newToken: Superlogin.ISession
     let password: string
     req = req || {}
     const { ip } = req
     try {
-      createSessionUser = await userDB.get<Superlogin.IUserDoc>(user_id)
+      createSessionUser = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
       const token = await generateSession(createSessionUser._id, createSessionUser.roles)
       password = token.password
       newToken = token
@@ -853,7 +875,7 @@ const user = (
       )
 
       // Refresh the session user just in case new dbs are created by this point
-      createSessionUser = await userDB.get<Superlogin.IUserDoc>(user_id)
+      createSessionUser = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
 
       // authorize the new session across all dbs
       if (!!createSessionUser.personalDBs) {
@@ -892,8 +914,8 @@ const user = (
       )
       const finalUser = await logoutUserSessions(userDoc, 'expired')
       createSessionUser = finalUser
-      await userDB.upsert<Superlogin.IUserDoc>(finalUser._id, rawDoc => {
-        const oldDoc = rawDoc as PouchDB.Core.Document<Superlogin.IUserDoc>
+      await userDB.upsert<Superlogin.IUserDoc<Profile>>(finalUser._id, rawDoc => {
+        const oldDoc = rawDoc as PouchDB.Core.Document<Superlogin.IUserDoc<Profile>>
         if (oldDoc.local) {
           delete oldDoc.local.lockedUntil
         }
@@ -939,7 +961,10 @@ const user = (
     }
   }
 
-  const handleFailedLogin = async (loginUser: Superlogin.IUserDoc, req: { ip?: string }) => {
+  const handleFailedLogin = async (
+    loginUser: Superlogin.IUserDoc<Profile>,
+    req: { ip?: string }
+  ) => {
     req = req || {}
     const maxFailedLogins = config.get().security.maxFailedLogins
     if (!maxFailedLogins) {
@@ -968,10 +993,10 @@ const user = (
       newSession = oldToken
       newSession.expires = Date.now() + sessionLife * 1000
       const results = await Promise.all([
-        await userDB.get<Superlogin.IUserDoc>(newSession._id),
+        await userDB.get<Superlogin.IUserDoc<Profile>>(newSession._id),
         await session.storeToken(newSession)
       ])
-      const userDoc: Superlogin.IUserDoc = results[0]
+      const userDoc: Superlogin.IUserDoc<Profile> = results[0]
       userDoc.session[key] = { ...userDoc.session[key], expires: newSession.expires }
       // Clean out expired sessions on refresh
       const finalUser = await logoutUserSessions(userDoc, 'expired')
@@ -995,7 +1020,7 @@ const user = (
     req = req || {}
     const ResetPasswordModel = new Model(resetPasswordModel)
     const passwordResetForm = new ResetPasswordModel(form)
-    let resetUser: Superlogin.IUserDoc
+    let resetUser: Superlogin.IUserDoc<Profile>
     return passwordResetForm
       .validate()
       .then(
@@ -1013,7 +1038,7 @@ const user = (
             status: 400
           })
       )
-      .then(async (results: { rows: Array<{ doc: Superlogin.IUserDoc }> }) => {
+      .then(async (results: { rows: Array<{ doc: Superlogin.IUserDoc<Profile> }> }) => {
         if (!results.rows.length) {
           return Promise.reject({ status: 400, error: 'Invalid token' })
         }
@@ -1037,14 +1062,14 @@ const user = (
         // logout user completely
         return logoutUserSessions(resetUser, 'all')
       })
-      .then(async (userDoc: Superlogin.IUserDoc) => {
+      .then(async (userDoc: Superlogin.IUserDoc<Profile>) => {
         resetUser = userDoc
         delete resetUser.forgotPassword
         return logActivity(resetUser._id, 'reset password', 'local', req, resetUser)
       })
-      .then(async (finalUser: Superlogin.IUserDoc) =>
-        userDB.upsert<Superlogin.IUserDoc>(finalUser._id, rawUser => {
-          const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc>
+      .then(async (finalUser: Superlogin.IUserDoc<Profile>) =>
+        userDB.upsert<Superlogin.IUserDoc<Profile>>(finalUser._id, rawUser => {
+          const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc<Profile>>
           delete oldUser.forgotPassword
           return merge({}, oldUser, finalUser)
         })
@@ -1063,7 +1088,7 @@ const user = (
     req = req || {}
     const ChangePasswordModel = new Model(changePasswordModel)
     const changePasswordForm = new ChangePasswordModel(form)
-    let changePwUser: Superlogin.IUserDoc
+    let changePwUser: Superlogin.IUserDoc<Profile>
     return changePasswordForm
       .validate()
       .then(
@@ -1076,7 +1101,7 @@ const user = (
           })
       )
       .then(async () => userDB.get(user_id))
-      .then(async (userDoc: Superlogin.IUserDoc) => {
+      .then(async (userDoc: Superlogin.IUserDoc<Profile>) => {
         changePwUser = userDoc
         if (changePwUser.local && changePwUser.local.salt && changePwUser.local.derived_key) {
           // Password is required
@@ -1112,11 +1137,11 @@ const user = (
 
   const forgotPassword = async (email: string, req: { ip?: string }) => {
     req = req || {}
-    let forgotPwUser: Superlogin.IUserDoc
+    let forgotPwUser: Superlogin.IUserDoc<Profile>
     let token: string
     let tokenHash: string
     try {
-      const result = await userDB.query<Superlogin.IUserDoc>('auth/email', {
+      const result = await userDB.query<Superlogin.IUserDoc<Profile>>('auth/email', {
         key: email,
         include_docs: true
       })
@@ -1127,7 +1152,7 @@ const user = (
           status: 404
         })
       }
-      forgotPwUser = result.rows[0].doc as Superlogin.IUserDoc
+      forgotPwUser = result.rows[0].doc as Superlogin.IUserDoc<Profile>
       token = util.URLSafeUUID()
       tokenHash = util.hashToken(token)
       forgotPwUser.forgotPassword = {
@@ -1158,8 +1183,8 @@ const user = (
 
   const verifyEmail = async (token: string, req: { ip?: string }) => {
     req = req || {}
-    let verifyEmailUser: Superlogin.IUserDoc
-    const result = await userDB.query<Superlogin.IUserDoc>('auth/verifyEmail', {
+    let verifyEmailUser: Superlogin.IUserDoc<Profile>
+    const result = await userDB.query<Superlogin.IUserDoc<Profile>>('auth/verifyEmail', {
       key: token,
       include_docs: true
     })
@@ -1167,7 +1192,7 @@ const user = (
     if (!result.rows.length) {
       return Promise.reject({ error: 'Invalid token', status: 400 })
     }
-    verifyEmailUser = result.rows[0].doc as Superlogin.IUserDoc
+    verifyEmailUser = result.rows[0].doc as Superlogin.IUserDoc<Profile>
     verifyEmailUser.email = verifyEmailUser.unverifiedEmail.email
     delete verifyEmailUser.unverifiedEmail
     emitter.emit('email-verified', verifyEmailUser)
@@ -1178,8 +1203,8 @@ const user = (
       req,
       verifyEmailUser
     )
-    return userDB.upsert<Superlogin.IUserDoc>(finalUser._id, rawUser => {
-      const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc>
+    return userDB.upsert<Superlogin.IUserDoc<Profile>>(finalUser._id, rawUser => {
+      const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc<Profile>>
       delete oldUser.unverifiedEmail
       return merge({}, oldUser, finalUser)
     })
@@ -1191,7 +1216,7 @@ const user = (
     req: { user?: { provider: string }; ip?: string }
   ) => {
     req = req || {}
-    let changeEmailUser: Superlogin.IUserDoc
+    let changeEmailUser: Superlogin.IUserDoc<Profile>
     if (!req.user) {
       req.user = { provider: 'local' }
     }
@@ -1202,7 +1227,7 @@ const user = (
       if (err) {
         return Promise.reject(err)
       }
-      changeEmailUser = await userDB.get<Superlogin.IUserDoc>(user_id)
+      changeEmailUser = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
 
       if (config.get().local.sendConfirmEmail) {
         changeEmailUser.unverifiedEmail = {
@@ -1245,7 +1270,7 @@ const user = (
       const dbConfig = dbAuth.getDBConfig(dbName, type || 'private')
       dbConfig.designDocs = designDocs || dbConfig.designDocs || []
       dbConfig.permissions = permissions || dbConfig.permissions
-      const userDoc = await userDB.get<Superlogin.IUserDoc>(user_id)
+      const userDoc = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
 
       const finalDBName = await dbAuth.addUserDB(
         userDoc,
@@ -1282,11 +1307,11 @@ const user = (
     deletePrivate: boolean,
     deleteShared: boolean
   ) => {
-    let removeUser: Superlogin.IUserDoc
+    let removeUser: Superlogin.IUserDoc<Profile>
     let update = false
     let dbID: string
     try {
-      const userDoc = await userDB.get<Superlogin.IUserDoc>(user_id)
+      const userDoc = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
       removeUser = userDoc
       if (removeUser.personalDBs && typeof removeUser.personalDBs === 'object') {
         await Promise.all(
@@ -1316,8 +1341,8 @@ const user = (
 
       if (update) {
         emitter.emit('user-db-removed', user_id, dbName)
-        return userDB.upsert<Superlogin.IUserDoc>(removeUser._id, rawUser => {
-          const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc>
+        return userDB.upsert<Superlogin.IUserDoc<Profile>>(removeUser._id, rawUser => {
+          const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc<Profile>>
           if (oldUser.personalDBs[dbID]) {
             delete oldUser.personalDBs[dbID]
           }
@@ -1332,9 +1357,9 @@ const user = (
   }
 
   const logoutUser = async (user_id: string, session_id: string) => {
-    let logoutUserDoc: Superlogin.IUserDoc
+    let logoutUserDoc: Superlogin.IUserDoc<Profile>
     if (user_id) {
-      logoutUserDoc = await userDB.get<Superlogin.IUserDoc>(user_id)
+      logoutUserDoc = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
     } else {
       if (!session_id) {
         return Promise.reject({
@@ -1343,7 +1368,7 @@ const user = (
           status: 401
         })
       }
-      const results = await userDB.query<Superlogin.IUserDoc>('auth/session', {
+      const results = await userDB.query<Superlogin.IUserDoc<Profile>>('auth/session', {
         key: session_id,
         include_docs: true
       })
@@ -1354,25 +1379,25 @@ const user = (
           status: 401
         })
       }
-      logoutUserDoc = results.rows[0].doc as Superlogin.IUserDoc
+      logoutUserDoc = results.rows[0].doc as Superlogin.IUserDoc<Profile>
     }
     user_id = logoutUserDoc._id
     await logoutUserSessions(logoutUserDoc, 'all')
     emitter.emit('logout', user_id)
     emitter.emit('logout-all', user_id)
-    return userDB.upsert<Superlogin.IUserDoc>(logoutUserDoc._id, rawUser => {
-      const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc>
+    return userDB.upsert<Superlogin.IUserDoc<Profile>>(logoutUserDoc._id, rawUser => {
+      const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc<Profile>>
       delete oldUser.session
       return merge({}, oldUser, logoutUserDoc)
     })
   }
 
   const logoutSession = async (session_id: string) => {
-    let logoutUserDoc: Superlogin.IUserDoc
+    let logoutUserDoc: Superlogin.IUserDoc<Profile>
     let startSessions = 0
     let endSessions = 0
     try {
-      const results = await userDB.query<Superlogin.IUserDoc>('auth/session', {
+      const results = await userDB.query<Superlogin.IUserDoc<Profile>>('auth/session', {
         key: session_id,
         include_docs: true
       })
@@ -1383,7 +1408,7 @@ const user = (
           status: 401
         })
       }
-      logoutUserDoc = results.rows[0].doc as Superlogin.IUserDoc
+      logoutUserDoc = results.rows[0].doc as Superlogin.IUserDoc<Profile>
       if (logoutUserDoc.session) {
         startSessions = Object.keys(logoutUserDoc.session).length
         if (logoutUserDoc.session[session_id]) {
@@ -1405,8 +1430,8 @@ const user = (
       }
       emitter.emit('logout', logoutUserDoc._id)
       if (startSessions !== endSessions) {
-        return userDB.upsert<Superlogin.IUserDoc>(logoutUserDoc._id, rawUser => {
-          const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc>
+        return userDB.upsert<Superlogin.IUserDoc<Profile>>(logoutUserDoc._id, rawUser => {
+          const oldUser = rawUser as PouchDB.Core.Document<Superlogin.IUserDoc<Profile>>
           delete oldUser.session
           return merge({}, oldUser, logoutUserDoc)
         })
@@ -1419,9 +1444,9 @@ const user = (
   }
 
   const remove = async (user_id: string, destroyDBs: boolean) => {
-    let removeUser: Superlogin.IUserDoc
+    let removeUser: Superlogin.IUserDoc<Profile>
     try {
-      const userDoc = await userDB.get<Superlogin.IUserDoc>(user_id)
+      const userDoc = await userDB.get<Superlogin.IUserDoc<Profile>>(user_id)
       await logoutUserSessions(userDoc, 'all')
       removeUser = userDoc
       if (destroyDBs !== true || !removeUser.personalDBs) {
