@@ -45,9 +45,7 @@ declare const user: <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
             provider?: string;
             roles: string[];
             token?: string;
-            userDBs?: {
-                [name: string]: string;
-            };
+            userDBs?: Record<string, string>;
             user_id?: string;
             profile?: Superlogin.IProfile;
         }>;
@@ -63,9 +61,7 @@ declare const user: <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
             provider?: string;
             roles: string[];
             token?: string;
-            userDBs?: {
-                [name: string]: string;
-            };
+            userDBs?: Record<string, string>;
             user_id?: string;
             profile?: Superlogin.IProfile;
         }>;
@@ -213,9 +209,7 @@ declare const user: <Profile extends Superlogin.IProfile = Superlogin.IProfile>(
         provider?: string;
         roles: string[];
         token?: string;
-        userDBs?: {
-            [name: string]: string;
-        };
+        userDBs?: Record<string, string>;
         user_id?: string;
         profile?: Superlogin.IProfile;
     }>;

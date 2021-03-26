@@ -226,7 +226,7 @@ export declare namespace Superlogin {
     roles: string[]
     salt?: string
     token?: string
-    userDBs?: { [name: string]: string }
+    userDBs?: Record<string, string>
     user_id?: string
     profile?: Superlogin.IProfile
   }
@@ -266,8 +266,9 @@ export declare namespace Superlogin {
     roles: string[]
     displayName?: string
     companyName?: string
-    providers: string[]
+    providers?: string[]
     profile: Profile
+    userDBs: Record<string, string>
     forgotPassword?: {
       expires: number
       token: string
@@ -280,7 +281,7 @@ export declare namespace Superlogin {
       derived_key?: string
       lockedUntil?: number
     }
-    signUp: {
+    signUp?: {
       provider: string
       timestamp: string
       ip: string
