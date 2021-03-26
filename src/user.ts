@@ -670,8 +670,13 @@ const user = (
         if (profile.displayName) {
           userDoc.name = profile.displayName
         }
-        if (profile.name && profile.name.firstName && profile.name.lastName) {
-          userDoc.name = `${profile.name.firstName} ${profile.name.lastName}`
+        if (profile.name) {
+          const firstName = profile.name.firstName || profile.name.givenName
+          const lastName = profile.name.lastName || profile.name.familyName
+
+          if (firstName && lastName) {
+            userDoc.name = `${firstName} ${lastName}`
+          }
         }
       }
       delete userDoc[provider].profile._raw
