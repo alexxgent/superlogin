@@ -217,7 +217,7 @@ export declare namespace Superlogin {
         companyName?: string;
         providers: string[];
         profile: IProfile;
-        forgotPassword: {
+        forgotPassword?: {
             expires: number;
             token: string;
             issued: number;
