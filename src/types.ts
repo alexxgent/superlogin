@@ -250,6 +250,8 @@ export declare namespace Superlogin {
   type UserDocSession = Pick<ISession, 'issued' | 'expires' | 'provider' | 'ip'>
 
   interface IUserDoc<Profile extends IProfile = IProfile> {
+    ip?: string
+    provider?: string
     user_id?: string
     activity?: IActivity[] | IActivity
     _rev: string
