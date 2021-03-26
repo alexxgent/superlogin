@@ -3,11 +3,12 @@ import ejs, { Data } from 'ejs'
 import fs from 'fs'
 import nodemailer from 'nodemailer'
 import stubTransport from 'nodemailer-stub-transport'
+import { Superlogin } from 'types'
 import { promisify } from 'util'
 
 const debug = d('superlogin')
 
-const mailer = (config: IConfigure): IMailer => {
+const mailer = (config: IConfigure): Superlogin.IMailer => {
   const configMailer = config.get().mailer
   const configTestMode = config.get().testMode
   const transport =
@@ -47,12 +48,6 @@ const mailer = (config: IConfigure): IMailer => {
       // send the message
       return sendEmail(mailOptions)
     }
-  }
-}
-
-declare global {
-  interface IMailer {
-    sendEmail(templateName: string, email: string, locals: Data): void
   }
 }
 

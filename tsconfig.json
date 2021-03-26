@@ -21,7 +21,7 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
     "target": "esnext",
     "watch": false,

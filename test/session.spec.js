@@ -37,7 +37,9 @@ describe('Session', function() {
       return runTest(fileConfig, 'File adapter')
     })
     .finally(function() {
-      config.set(old => merge({}, old, { session: { adapter: 'redis' } }))
+      config.set(old =>
+        merge({}, old, { session: { adapter: 'redis', redis: { password: 'local' } } })
+      )
       return runTest(config, 'Redis adapter')
     })
     .finally(function() {

@@ -65,7 +65,7 @@ const Session = (config: IConfigure) => {
           ...token,
           salt: hash.salt,
           derived_key: hash.derived_key,
-          password: undefined
+          password: undefined as string
         }
 
         await adapter.storeKey(

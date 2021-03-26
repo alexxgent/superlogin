@@ -17,6 +17,9 @@ export declare namespace Superlogin {
     admins: { roles: string[]; names: string[]; members?: string[] }
     members: { roles: string[]; names: string[]; members?: string[] }
   }
+  interface IMailer {
+    sendEmail(templateName: string, email: string, locals: Data): void
+  }
   export type DBType = 'private' | 'shared'
   interface IConfiguration {
     // Useful settings for testing and debugging your app
@@ -193,6 +196,10 @@ export declare namespace Superlogin {
       }
     }
   }
+  interface IConfigure {
+    get(): IConfiguration
+    set(setFunc: (oldCfg: IConfiguration) => IConfiguration): void
+  }
 
   export interface IUserConfig {
     testMode?: IConfiguration['testMode']
@@ -207,7 +214,7 @@ export declare namespace Superlogin {
     userModel?: IConfiguration['userModel']
   }
 
-  interface ISession {
+  export interface ISession {
     _id: string
     derived_key?: string
     expires: number
@@ -221,6 +228,7 @@ export declare namespace Superlogin {
     token?: string
     userDBs?: { [name: string]: string }
     user_id?: string
+    profile?: Superlogin.IProfile
   }
 
   interface IProfile {
@@ -240,7 +248,7 @@ export declare namespace Superlogin {
     ip: string
   }
 
-  interface IUserDoc extends ISession {
+  interface IUserDoc {
     activity?: IActivity[] | IActivity
     _rev: string
     rev?: string
@@ -248,7 +256,7 @@ export declare namespace Superlogin {
     password: string
     confirmPassword: string
     name: string
-    email: string
+    email?: string
     _id: string
     type: string
     roles: string[]
@@ -275,7 +283,7 @@ export declare namespace Superlogin {
     }
     apple?: {}
     google?: {}
-    session: { [name: string]: { expires?: number } }
+    session?: { [name: string]: { expires?: number } }
     personalDBs: { [dbName: string]: { name: string; type?: string } }
   }
 

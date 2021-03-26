@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { Passport } from 'passport'
+
 import { Superlogin } from './types'
 import util from './util'
 

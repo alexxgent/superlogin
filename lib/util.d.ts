@@ -8,9 +8,9 @@ declare const _default: {
         derived_key: string;
     }>;
     verifyPassword: (hashObj: {
-        iterations?: number | undefined;
-        salt?: string | undefined;
-        derived_key?: string | undefined;
+        iterations?: number;
+        salt?: string;
+        derived_key?: string;
     }, password: string) => Promise<boolean>;
     getDBURL: ({ user, protocol, host, password }: {
         designDocDir: string;
@@ -18,8 +18,8 @@ declare const _default: {
         host: string;
         user: string;
         password: string;
-        publicURL?: string | undefined;
-        cloudant?: boolean | undefined;
+        publicURL?: string;
+        cloudant?: boolean;
         userDB: string;
         couchAuthDB: string;
     }) => string;
@@ -29,14 +29,14 @@ declare const _default: {
         host: string;
         user: string;
         password: string;
-        publicURL?: string | undefined;
-        cloudant?: boolean | undefined;
+        publicURL?: string;
+        cloudant?: boolean;
         userDB: string;
         couchAuthDB: string;
     }, dbName: string) => string;
     getSessions: ({ session }: Superlogin.IUserDoc) => string[];
     getExpiredSessions: ({ session }: Superlogin.IUserDoc, now: number) => string[];
-    getSessionToken: (req: Request) => string | undefined;
+    getSessionToken: (req: Request) => string;
     addProvidersToDesignDoc: (config: IConfigure, ddoc: {
         auth: {
             views: {};

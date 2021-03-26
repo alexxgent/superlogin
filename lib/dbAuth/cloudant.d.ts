@@ -3,7 +3,7 @@ declare const _default: {
         key: string;
         password: string;
         ok: boolean;
-    } | undefined>;
+    }>;
     getSecurityCloudant: (db: PouchDB.Database<{}>) => Promise<any>;
     putSecurityCloudant: (db: PouchDB.Database<{}>, doc: {}) => Promise<any>;
     storeKey: () => Promise<void>;

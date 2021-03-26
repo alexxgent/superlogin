@@ -17,7 +17,7 @@ const user = (
   config: IConfigure,
   userDB: PouchDB.Database<Superlogin.IUserDoc>,
   couchAuthDB: PouchDB.Database,
-  mailer: IMailer,
+  mailer: Superlogin.IMailer,
   emitter: EventEmitter
 ) => {
   const dbAuth = DBAuth(config, userDB, couchAuthDB)
@@ -41,7 +41,7 @@ const user = (
     user_id: string,
     action: string,
     provider: string,
-    req: { ip: string },
+    req: { ip?: string },
     userDoc: Superlogin.IUserDoc,
     saveDoc?: boolean
   ) => {
@@ -128,7 +128,7 @@ const user = (
     user_id: string,
     newPassword: string,
     userDoc: Superlogin.IUserDoc,
-    req: { ip: string }
+    req: { ip?: string }
   ) => {
     req = req || {}
     let changePwUser: Superlogin.IUserDoc
@@ -509,7 +509,7 @@ const user = (
     return null
   }
 
-  const create = async (form: {}, req: { ip: string }) => {
+  const create = async (form: {}, req: { ip?: string }) => {
     req = req || {}
     let finalUserModel = userModel
     const newUserModel = config.get().userModel
@@ -584,7 +584,7 @@ const user = (
     provider: string,
     auth: string,
     profile: Superlogin.IProfile,
-    req: { ip: string }
+    req: { ip?: string }
   ) => {
     let userDoc: Superlogin.IUserDoc
     let newAccount = false
@@ -701,7 +701,7 @@ const user = (
     provider: string,
     auth: string,
     profile: Superlogin.IProfile,
-    req: { ip: string }
+    req: { ip?: string }
   ) => {
     req = req || {}
     let linkUser: Superlogin.IUserDoc
@@ -826,10 +826,10 @@ const user = (
     }
   }
 
-  const createSession = async (user_id: string, provider: string, req: { ip: string }) => {
+  const createSession = async (user_id: string, provider: string, req: { ip?: string }) => {
     let createSessionUser: Superlogin.IUserDoc
     let newToken: Superlogin.ISession
-    let newSession: Partial<Superlogin.IUserDoc>
+    let newSession: Partial<Superlogin.ISession>
     let password: string
     req = req || {}
     const { ip } = req
@@ -931,7 +931,7 @@ const user = (
     }
   }
 
-  const handleFailedLogin = async (loginUser: Superlogin.IUserDoc, req: { ip: string }) => {
+  const handleFailedLogin = async (loginUser: Superlogin.IUserDoc, req: { ip?: string }) => {
     req = req || {}
     const maxFailedLogins = config.get().security.maxFailedLogins
     if (!maxFailedLogins) {
@@ -983,7 +983,7 @@ const user = (
     }
   }
 
-  const resetPassword = (form: { token: string; password: string }, req: { ip: string }) => {
+  const resetPassword = (form: { token: string; password: string }, req: { ip?: string }) => {
     req = req || {}
     const ResetPasswordModel = new Model(resetPasswordModel)
     const passwordResetForm = new ResetPasswordModel(form)
@@ -1050,7 +1050,7 @@ const user = (
   const changePasswordSecure = async (
     user_id: string,
     form: { newPassword: string; currentPassword: string },
-    req: { ip: string; user: { key: string } }
+    req: { ip?: string; user?: { key: string } }
   ) => {
     req = req || {}
     const ChangePasswordModel = new Model(changePasswordModel)
@@ -1102,7 +1102,7 @@ const user = (
       })
   }
 
-  const forgotPassword = async (email: string, req: { ip: string }) => {
+  const forgotPassword = async (email: string, req: { ip?: string }) => {
     req = req || {}
     let forgotPwUser: Superlogin.IUserDoc
     let token: string
@@ -1148,7 +1148,7 @@ const user = (
     }
   }
 
-  const verifyEmail = async (token: string, req: { ip: string }) => {
+  const verifyEmail = async (token: string, req: { ip?: string }) => {
     req = req || {}
     let verifyEmailUser: Superlogin.IUserDoc
     const result = await userDB.query<Superlogin.IUserDoc>('auth/verifyEmail', {
@@ -1180,7 +1180,7 @@ const user = (
   const changeEmail = async (
     user_id: string,
     newEmail: string,
-    req: { user: { provider: string }; ip: string }
+    req: { user?: { provider: string }; ip?: string }
   ) => {
     req = req || {}
     let changeEmailUser: Superlogin.IUserDoc
@@ -1235,7 +1235,7 @@ const user = (
   ) => {
     try {
       const dbConfig = dbAuth.getDBConfig(dbName, type || 'private')
-      dbConfig.designDocs = designDocs || dbConfig.designDocs || ''
+      dbConfig.designDocs = designDocs || dbConfig.designDocs || []
       dbConfig.permissions = permissions || dbConfig.permissions
       const userDoc = await userDB.get<Superlogin.IUserDoc>(user_id)
 

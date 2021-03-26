@@ -25,6 +25,9 @@ export declare namespace Superlogin {
             members?: string[];
         };
     }
+    interface IMailer {
+        sendEmail(templateName: string, email: string, locals: Data): void;
+    }
     type DBType = 'private' | 'shared';
     interface IConfiguration {
         testMode?: {
@@ -140,6 +143,10 @@ export declare namespace Superlogin {
             };
         };
     }
+    interface IConfigure {
+        get(): IConfiguration;
+        set(setFunc: (oldCfg: IConfiguration) => IConfiguration): void;
+    }
     interface IUserConfig {
         testMode?: IConfiguration['testMode'];
         security?: Partial<IConfiguration['security']>;
@@ -168,6 +175,7 @@ export declare namespace Superlogin {
             [name: string]: string;
         };
         user_id?: string;
+        profile?: Superlogin.IProfile;
     }
     interface IProfile {
         [key: string]: {};
@@ -189,7 +197,7 @@ export declare namespace Superlogin {
         provider: string;
         ip: string;
     }
-    interface IUserDoc extends ISession {
+    interface IUserDoc {
         activity?: IActivity[] | IActivity;
         _rev: string;
         rev?: string;
@@ -200,7 +208,7 @@ export declare namespace Superlogin {
         password: string;
         confirmPassword: string;
         name: string;
-        email: string;
+        email?: string;
         _id: string;
         type: string;
         roles: string[];
@@ -227,7 +235,7 @@ export declare namespace Superlogin {
         };
         apple?: {};
         google?: {};
-        session: {
+        session?: {
             [name: string]: {
                 expires?: number;
             };

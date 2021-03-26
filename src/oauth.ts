@@ -65,13 +65,13 @@ const oauth = (router: Router, passport: Passport, user: User, config: IConfigur
     operation: 'login' | 'link'
   ): RequestHandler => (req, res, next) => {
     const stateRequired = isStateRequired(provider)
-    const accessToken = req.query.bearer_token || req.query.state
+    const accessToken = (req.query.bearer_token || req.query.state) as string
     const callbackURL = getLinkCallbackURLs(provider, req, operation, accessToken)
     const finalOptions = {
       ...options,
       callbackURL,
       session: false,
-      state: accessToken && stateRequired ? accessToken : undefined
+      state: accessToken && stateRequired
     }
     return passport.authenticate(provider, finalOptions)(req, res, next)
   }

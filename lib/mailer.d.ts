@@ -1,8 +1,3 @@
-import { Data } from 'ejs';
-declare const mailer: (config: IConfigure) => IMailer;
-declare global {
-    interface IMailer {
-        sendEmail(templateName: string, email: string, locals: Data): void;
-    }
-}
+import { Superlogin } from 'types';
+declare const mailer: (config: IConfigure) => Superlogin.IMailer;
 export default mailer;
