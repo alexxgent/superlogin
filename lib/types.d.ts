@@ -179,7 +179,7 @@ export declare namespace Superlogin {
     }
     interface IProfile {
         [key: string]: {};
-        name: {
+        name?: {
             firstName: string;
             lastName: string;
         };
@@ -187,7 +187,7 @@ export declare namespace Superlogin {
         username?: string;
         id: string;
         email: string;
-        emails: Array<{
+        emails?: Array<{
             value: string;
         }>;
     }

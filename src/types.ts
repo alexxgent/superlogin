@@ -233,12 +233,12 @@ export declare namespace Superlogin {
 
   interface IProfile {
     [key: string]: {}
-    name: { firstName: string; lastName: string }
+    name?: { firstName: string; lastName: string }
     displayName: string
     username?: string
     id: string
     email: string
-    emails: Array<{ value: string }>
+    emails?: Array<{ value: string }>
   }
 
   interface IActivity {
