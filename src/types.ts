@@ -259,7 +259,7 @@ export declare namespace Superlogin {
     unverifiedEmail?: { email: string; token: string }
     password?: string
     confirmPassword?: string
-    name: string
+    name?: string
     email: string
     _id: string
     type?: string

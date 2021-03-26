@@ -212,7 +212,7 @@ export declare namespace Superlogin {
         };
         password?: string;
         confirmPassword?: string;
-        name: string;
+        name?: string;
         email: string;
         _id: string;
         type?: string;
