@@ -185,7 +185,7 @@ export declare namespace Superlogin {
         displayName?: string;
         username?: string;
         id?: string;
-        email: string;
+        email?: string;
         emails?: Array<{
             value?: string;
         }>;
